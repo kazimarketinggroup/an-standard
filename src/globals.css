@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-white text-brand-ink font-sans antialiased;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-semibold tracking-tight;
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-5 py-3
+           text-sm font-medium transition-all duration-200
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-red text-white shadow-sm
+           hover:bg-brand-redDark hover:shadow-lift focus-visible:ring-brand-red;
+  }
+
+  .btn-outline {
+    @apply btn border border-white/40 bg-white/5 text-white backdrop-blur-sm
+           hover:bg-white/15 focus-visible:ring-white;
+  }
+
+  .btn-ghost {
+    @apply btn border border-brand-ink/15 text-brand-ink
+           hover:border-brand-ink/30 hover:bg-brand-ink/5 focus-visible:ring-brand-ink;
+  }
+
+  /* Amber call button — dark ink text, since white fails contrast on yellow. */
+  .btn-call {
+    @apply btn bg-brand-amber text-brand-ink shadow-sm
+           hover:bg-brand-amberDark hover:shadow-lift focus-visible:ring-brand-amber;
+  }
+
+  /* Solid navy secondary, for use beside .btn-primary on light backgrounds. */
+  .btn-navy {
+    @apply btn bg-brand-navy text-white shadow-sm
+           hover:bg-brand-navyDark hover:shadow-lift focus-visible:ring-brand-navy;
+  }
+
+  /* Caps the shared container at every breakpoint, not just the largest. */
+  .container {
+    @apply max-w-container;
+  }
+
+  .section {
+    @apply py-12 sm:py-14 lg:py-16;
+  }
+
+  .eyebrow {
+    @apply text-xs font-medium uppercase tracking-[0.18em] text-brand-muted;
+  }
+}
+
+/*
+ * Hero entrance. Deliberately CSS rather than framer-motion: above-the-fold
+ * content must be visible even if JS is slow, blocked, or still hydrating,
+ * so the end state is the default and the animation only plays backwards from it.
+ */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-rise {
+  animation: hero-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/*
+ * Diagonal cross-hatch overlay — two opposing sets of hairline white stripes,
+ * suggesting the stitch grid of a quilt without competing with the content.
+ */
+.pattern-stripes {
+  background-image: repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.045) 0 1px,
+      transparent 1px 64px
+    ),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 64px);
+  pointer-events: none;
+}
+
+/*
+ * Continuous marquee. The track holds two copies of the list, so translating
+ * by exactly -50% lands the second copy where the first started — the reset is
+ * invisible. Duration is set per-instance via --marquee-duration.
+ */
+@keyframes marquee-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee {
+  animation: marquee-scroll var(--marquee-duration, 40s) linear infinite;
+  will-change: transform;
+}
+
+.marquee:hover,
+.marquee:focus-within {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation: none;
+    /* Without the animation the doubled track would overflow, so allow scroll. */
+    overflow-x: auto;
+    width: 100% !important;
+  }
+}
+
+/* Hide scrollbars on horizontal carousels while keeping them scrollable */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
