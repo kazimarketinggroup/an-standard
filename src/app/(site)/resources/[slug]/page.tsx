@@ -6,6 +6,13 @@ import Reveal from '@/components/motion/Reveal'
 import { getResourceArticle, getResourceArticles } from '@/lib/cms/queries'
 import { imageSrc, list, stringList, text } from '@/lib/cms/fallbacks'
 
+/**
+ * Revalidate on a timer as well as on save: pages built from
+ * generateStaticParams are otherwise fully static, and revalidatePath alone
+ * does not rebuild them.
+ */
+export const revalidate = 60
+
 export async function generateStaticParams() {
   const articles = await getResourceArticles()
   return articles.map((article) => ({ slug: article.slug }))

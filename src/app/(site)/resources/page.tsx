@@ -114,3 +114,6 @@ export default async function ResourcesPage() {
     </>
   )
 }
+
+/** Rebuilt on save, and on this timer as a backstop. */
+export const revalidate = 60

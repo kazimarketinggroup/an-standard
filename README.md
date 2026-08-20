@@ -20,8 +20,11 @@ The left-hand menu is grouped by section. Click any entry to edit that page.
 Every screen has a **View live page ↗** link at the top so you can open the
 real page in a new tab and check your work.
 
-Changes are live the moment you press **Save**. There are no drafts, so only
-save when you are happy with the wording.
+There are no drafts, so only save when you are happy with the wording.
+
+Saved changes normally appear on the live site straight away. Pages are cached
+for speed, so if a change has not shown up yet, wait a minute and refresh — it
+will appear on its own.
 
 ### What you can edit
 
@@ -79,7 +82,7 @@ Environment variables (Supabase dashboard → Project Settings → API):
 | Variable | Purpose |
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | Project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public read key |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public read key. `NEXT_PUBLIC_SUPABASE_ANON_KEY` is accepted too — Supabase renamed it, and `lib/supabase/env.ts` reads whichever is set |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only. Bypasses RLS — never expose to the browser |
 
 ### First-time database setup
@@ -133,6 +136,11 @@ Points worth knowing before changing things:
 - **Icons cannot be stored in Postgres**, so rows keep an icon *key* that
   `icons.ts` resolves. Renaming a key orphans every row using it.
 - **The quote form's logic is deliberately not editable** — only its labels.
+- **Public pages are ISR, not fully static.** Each exports `revalidate = 60`.
+  Pages built via `generateStaticParams` are otherwise baked at build time, and
+  `revalidatePath` alone does *not* regenerate them — without the timer, a
+  content edit would never reach the live site. Save still calls
+  `revalidatePath('/', 'layout')`; the timer is what guarantees it lands.
 
 ### Legacy hardcoded pages
 

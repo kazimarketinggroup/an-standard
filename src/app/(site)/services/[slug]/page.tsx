@@ -10,6 +10,13 @@ import { imageSrc, list, stringList, text } from '@/lib/cms/fallbacks'
  * adds through the admin.
  */
 
+/**
+ * Revalidate on a timer as well as on save: pages built from
+ * generateStaticParams are otherwise fully static, and revalidatePath alone
+ * does not rebuild them.
+ */
+export const revalidate = 60
+
 export async function generateStaticParams() {
   const services = await getServices()
   return services.map((service) => ({ slug: service.slug }))

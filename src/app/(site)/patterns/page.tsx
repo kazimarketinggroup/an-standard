@@ -111,3 +111,6 @@ export default async function PatternsPage() {
     </>
   )
 }
+
+/** Rebuilt on save, and on this timer as a backstop. */
+export const revalidate = 60

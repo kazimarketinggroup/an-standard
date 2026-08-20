@@ -23,3 +23,6 @@ export default function Home() {
     </>
   )
 }
+
+/** Rebuilt on save, and on this timer as a backstop. */
+export const revalidate = 60

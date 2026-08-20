@@ -11,6 +11,13 @@ import { text } from '@/lib/cms/fallbacks'
  * route claims; anything not present in legal_pages 404s.
  */
 
+/**
+ * Revalidate on a timer as well as on save: pages built from
+ * generateStaticParams are otherwise fully static, and revalidatePath alone
+ * does not rebuild them.
+ */
+export const revalidate = 60
+
 export async function generateStaticParams() {
   const pages = await getLegalPages()
   return pages.map((page) => ({ slug: page.slug }))

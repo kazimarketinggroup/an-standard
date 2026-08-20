@@ -6,6 +6,13 @@ import QuoteCta from '@/components/layout/QuoteCta'
 import { getAboutSubpage, getAboutSubpages } from '@/lib/cms/queries'
 import { imageSrc, stringList, text } from '@/lib/cms/fallbacks'
 
+/**
+ * Revalidate on a timer as well as on save: pages built from
+ * generateStaticParams are otherwise fully static, and revalidatePath alone
+ * does not rebuild them.
+ */
+export const revalidate = 60
+
 export async function generateStaticParams() {
   const pages = await getAboutSubpages()
   return pages.map((page) => ({ slug: page.slug }))

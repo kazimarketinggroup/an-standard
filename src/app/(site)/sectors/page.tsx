@@ -136,3 +136,6 @@ export default async function SectorsPage() {
     </>
   )
 }
+
+/** Rebuilt on save, and on this timer as a backstop. */
+export const revalidate = 60

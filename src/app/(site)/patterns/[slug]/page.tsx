@@ -13,6 +13,13 @@ import type { PatternKind } from '@/components/patterns/PatternSwatch'
 type Params = { params: { slug: string } }
 
 /** One static page per pattern, so the whole set prerenders. */
+/**
+ * Revalidate on a timer as well as on save: pages built from
+ * generateStaticParams are otherwise fully static, and revalidatePath alone
+ * does not rebuild them.
+ */
+export const revalidate = 60
+
 export async function generateStaticParams() {
   const patterns = await getPatterns()
   const list = patterns.length > 0 ? patterns : fallbackPatterns()

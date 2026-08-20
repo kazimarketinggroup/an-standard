@@ -154,3 +154,6 @@ export default async function ContactPage() {
     </section>
   )
 }
+
+/** Rebuilt on save, and on this timer as a backstop. */
+export const revalidate = 60

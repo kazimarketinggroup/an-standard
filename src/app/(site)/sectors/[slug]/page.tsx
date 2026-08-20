@@ -14,6 +14,13 @@ import { resolveIcon } from '@/lib/cms/icons'
  * adds. Those files can be deleted once their content is confirmed in the CMS.
  */
 
+/**
+ * Revalidate on a timer as well as on save: pages built from
+ * generateStaticParams are otherwise fully static, and revalidatePath alone
+ * does not rebuild them.
+ */
+export const revalidate = 60
+
 export async function generateStaticParams() {
   const sectors = await getSectors()
   return sectors.map((sector) => ({ slug: sector.slug }))

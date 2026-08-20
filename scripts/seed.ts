@@ -44,8 +44,33 @@ const supabase = createClient(url, serviceKey, {
 
 let failures = 0
 
+/**
+ * Fills in the keys a row is missing, using the union of keys across the whole
+ * batch. Postgres applies a column default only when the key is absent from
+ * *every* row of an INSERT; in a multi-row upsert a key present on one row
+ * forces an explicit NULL on the others, which the NOT NULL columns reject.
+ */
+function squareOff(rows: Record<string, unknown>[]): Record<string, unknown>[] {
+  const keys = new Set<string>()
+  for (const row of rows) for (const key of Object.keys(row)) keys.add(key)
+
+  return rows.map((row) => {
+    const filled: Record<string, unknown> = { ...row }
+    for (const key of keys) {
+      if (filled[key] === undefined) {
+        // Match the column's type: the jsonb list columns default to [].
+        const sample = rows.find((r) => r[key] !== undefined)?.[key]
+        filled[key] = Array.isArray(sample) ? [] : ''
+      }
+    }
+    return filled
+  })
+}
+
 async function upsert(table: string, rows: unknown, conflict: string) {
-  const payload = Array.isArray(rows) ? rows : [rows]
+  const payload = squareOff(
+    (Array.isArray(rows) ? rows : [rows]) as Record<string, unknown>[]
+  )
   const { error } = await supabase.from(table).upsert(payload as never, { onConflict: conflict })
 
   if (error) {

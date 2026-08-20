@@ -134,3 +134,6 @@ export default async function ProcessPage() {
     </>
   )
 }
+
+/** Rebuilt on save, and on this timer as a backstop. */
+export const revalidate = 60

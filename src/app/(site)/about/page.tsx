@@ -125,3 +125,6 @@ export default async function AboutPage() {
     </>
   )
 }
+
+/** Rebuilt on save, and on this timer as a backstop. */
+export const revalidate = 60

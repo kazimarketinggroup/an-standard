@@ -1,5 +1,6 @@
 import { cache } from 'react'
 import { createPublicClient } from '../supabase/admin'
+import { isSupabaseConfigured } from '../supabase/env'
 import type {
   AboutPage,
   AboutSubpage,
@@ -39,9 +40,7 @@ import type {
  * skipped silently: the site renders from its fallbacks, and the build log
  * stays free of one error per table per page.
  */
-const isConfigured =
-  Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
-  Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+const isConfigured = isSupabaseConfigured
 
 async function fetchSingleton<T>(table: string): Promise<T | null> {
   if (!isConfigured) return null

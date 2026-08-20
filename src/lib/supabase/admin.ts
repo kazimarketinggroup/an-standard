@@ -1,4 +1,5 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { SUPABASE_PUBLIC_KEY, SUPABASE_URL } from './env'
 
 /**
  * Cookie-free Supabase clients.
@@ -15,8 +16,8 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js'
  */
 export function createPublicClient() {
   return createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    SUPABASE_URL,
+    SUPABASE_PUBLIC_KEY,
     { auth: { persistSession: false, autoRefreshToken: false } }
   )
 }
@@ -31,7 +32,7 @@ export function createAdminClient() {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set')
   }
 
-  return createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, key, {
+  return createSupabaseClient(SUPABASE_URL, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   })
 }

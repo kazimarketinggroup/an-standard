@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import LoginForm from './LoginForm'
+import { isSupabaseConfigured } from '@/lib/supabase/env'
 
 export const metadata: Metadata = {
   title: 'Sign in — A.N. Standard Ltd.',
@@ -7,9 +9,7 @@ export const metadata: Metadata = {
 }
 
 export default function AdminLoginPage() {
-  const configured =
-    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
-    Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  const configured = isSupabaseConfigured
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-100 px-4">
@@ -21,7 +21,11 @@ export default function AdminLoginPage() {
 
         <div className="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200">
           {configured ? (
-            <LoginForm />
+            // LoginForm reads ?next= via useSearchParams, which opts the whole
+            // page into client rendering unless it sits behind a boundary.
+            <Suspense fallback={<div className="h-[232px]" />}>
+              <LoginForm />
+            </Suspense>
           ) : (
             <div className="text-sm leading-relaxed text-neutral-600">
               <p className="font-medium text-neutral-900">Not configured yet</p>
@@ -29,7 +33,7 @@ export default function AdminLoginPage() {
                 Add <code className="rounded bg-neutral-100 px-1">NEXT_PUBLIC_SUPABASE_URL</code>{' '}
                 and{' '}
                 <code className="rounded bg-neutral-100 px-1">
-                  NEXT_PUBLIC_SUPABASE_ANON_KEY
+                  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
                 </code>{' '}
                 to <code className="rounded bg-neutral-100 px-1">.env.local</code>, then restart
                 the server.

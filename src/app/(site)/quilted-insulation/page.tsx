@@ -409,3 +409,6 @@ export default async function QuiltedInsulationPage() {
     </>
   )
 }
+
+/** Rebuilt on save, and on this timer as a backstop. */
+export const revalidate = 60

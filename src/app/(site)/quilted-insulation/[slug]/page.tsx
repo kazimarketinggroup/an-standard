@@ -9,6 +9,13 @@ import { imageSrc, list, stringList, text } from '@/lib/cms/fallbacks'
  * routes; this covers anything the client adds.
  */
 
+/**
+ * Revalidate on a timer as well as on save: pages built from
+ * generateStaticParams are otherwise fully static, and revalidatePath alone
+ * does not rebuild them.
+ */
+export const revalidate = 60
+
 export async function generateStaticParams() {
   const pages = await getInsulationSubpages()
   return pages.filter((page) => page.is_published).map((page) => ({ slug: page.slug }))

@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { SUPABASE_PUBLIC_KEY, SUPABASE_URL, isSupabaseConfigured } from '@/lib/supabase/env'
 
 /**
  * Guards /admin/* and keeps the Supabase session cookie fresh.
@@ -13,13 +14,13 @@ export async function middleware(request: NextRequest) {
 
   // Without configuration there is no way to sign in, so let the login page
   // render its own setup message rather than redirecting in a loop.
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (!isSupabaseConfigured) {
     return response
   }
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    SUPABASE_URL,
+    SUPABASE_PUBLIC_KEY,
     {
       cookies: {
         get(name: string) {

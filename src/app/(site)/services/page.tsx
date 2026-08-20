@@ -122,3 +122,6 @@ export default async function ServicesPage() {
     </>
   )
 }
+
+/** Rebuilt on save, and on this timer as a backstop. */
+export const revalidate = 60
