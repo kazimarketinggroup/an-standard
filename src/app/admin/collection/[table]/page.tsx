@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { collectionMeta, isCollectionKey } from '@/lib/cms/admin-nav'
 import CollectionList from './CollectionList'
 

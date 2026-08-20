@@ -4,7 +4,11 @@ import Link from 'next/link'
 import QuoteCta from '@/components/layout/QuoteCta'
 import Reveal, { RevealGroup, RevealItem } from '@/components/motion/Reveal'
 import { ArrowRightIcon } from '@/components/ui/Icons'
-import { sectors, sectorsBannerImage, sectorsHeroImage } from '@/lib/sectors'
+import { sectors as fallbackSectors, sectorsBannerImage, sectorsHeroImage } from '@/lib/sectors'
+import { getSectors, getSectorsPage } from '@/lib/cms/queries'
+import { imageSrc, text } from '@/lib/cms/fallbacks'
+import { resolveIcon } from '@/lib/cms/icons'
+import { multiline } from '@/lib/cms/render'
 
 export const metadata: Metadata = {
   title: 'Sectors — A.N. Standard Ltd.',
@@ -12,7 +16,24 @@ export const metadata: Metadata = {
     'The right pattern depends on what the finished product has to do. Pick your sector for the fabrics, fillings and patterns we normally run for it.',
 }
 
-export default function SectorsPage() {
+export default async function SectorsPage() {
+  const [page, dbSectors] = await Promise.all([getSectorsPage(), getSectors()])
+
+  const sectors =
+    dbSectors.length > 0
+      ? dbSectors.map((sector) => ({
+          href: `/sectors/${sector.slug}`,
+          name: sector.title,
+          body: sector.listing_card_teaser,
+          icon: resolveIcon(sector.icon),
+        }))
+      : fallbackSectors.map((sector) => ({
+          href: sector.href,
+          name: sector.name,
+          body: sector.body,
+          icon: sector.icon,
+        }))
+
   return (
     <>
       {/*
@@ -24,17 +45,14 @@ export default function SectorsPage() {
         <div className="container grid min-h-[600px] items-center gap-10 py-14 lg:grid-cols-2 lg:gap-16 lg:py-20">
           <div className="min-w-0">
             <h1 className="hero-rise text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl lg:text-[44px]">
-              Nine Sectors,
-              <br />
-              One Factory
+              {multiline(text(page?.hero_heading, 'Nine Sectors,\nOne Factory'))}
             </h1>
 
             <p
               className="hero-rise mt-6 max-w-md text-sm leading-relaxed text-brand-muted"
               style={{ animationDelay: '0.15s' }}
             >
-              The right pattern depends on what the finished product has to do. Pick your sector for
-              the fabrics, fillings and patterns we normally run for it.
+              {text(page?.hero_intro, 'The right pattern depends on what the finished product has to do. Pick your sector for the fabrics, fillings and patterns we normally run for it.')}
             </p>
 
             <div

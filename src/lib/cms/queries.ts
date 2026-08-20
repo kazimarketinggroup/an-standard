@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import { createPublicClient } from '../supabase/server'
+import { createPublicClient } from '../supabase/admin'
 import type {
   AboutPage,
   AboutSubpage,

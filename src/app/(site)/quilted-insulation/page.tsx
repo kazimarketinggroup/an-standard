@@ -3,7 +3,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import PageHero from '@/components/layout/PageHero'
 import Reveal, { RevealGroup, RevealItem } from '@/components/motion/Reveal'
-import { insulationItems } from '@/lib/insulation'
+import { insulationItems as fallbackItems } from '@/lib/insulation'
+import { getInsulationPage, getInsulationSubpages } from '@/lib/cms/queries'
+import { imageSrc, list, stringList, text } from '@/lib/cms/fallbacks'
+import { resolveIcon } from '@/lib/cms/icons'
+import { multiline } from '@/lib/cms/render'
 
 export const metadata: Metadata = {
   title: 'Quilted Insulation — A.N. Standard Ltd.',
@@ -59,19 +63,46 @@ const reasons = [
   'We never manufacture competing finished products',
 ]
 
-export default function QuiltedInsulationPage() {
+export default async function QuiltedInsulationPage() {
+  const [page, subpages] = await Promise.all([getInsulationPage(), getInsulationSubpages()])
+
+  const insulationItems =
+    subpages.length > 0
+      ? subpages.map((item) => ({
+          title: item.title,
+          tagline: item.tagline,
+          body: item.teaser_text,
+          href: `/quilted-insulation/${item.slug}`,
+          icon: resolveIcon(item.icon),
+          ready: item.is_published,
+        }))
+      : fallbackItems
+
+  const pageSpecs = list(page?.stat_boxes).length ? list(page?.stat_boxes) : specs
+  const pageIndustries = stringList(page?.suitable_industries).length
+    ? stringList(page?.suitable_industries)
+    : industries
+  const pageFabrics = stringList(page?.fabrics_we_quilt).length
+    ? stringList(page?.fabrics_we_quilt)
+    : fabrics
+  const pageReasons = stringList(page?.why_work_with_us).length
+    ? stringList(page?.why_work_with_us)
+    : reasons
+
   return (
     <>
       <PageHero
-        title={
-          <>
-            Quilted Insulation,
-            <br />
-            Manufactured In The UK
-          </>
+        title={multiline(
+          text(page?.hero_heading, 'Quilted Insulation,\nManufactured In The UK')
+        )}
+        intro={text(
+          page?.hero_intro,
+          'We worked alongside the developer of quilted fibreglass and have since taken over its full manufacture, which makes us the UK’s leading supplier of the product.'
+        )}
+        image={
+          imageSrc(page?.hero_image) ??
+          `${IMG}/vecteezy_autumn-themed-patchwork-quilt_70066206 1.png`
         }
-        intro="We worked alongside the developer of quilted fibreglass and have since taken over its full manufacture, which makes us the UK’s leading supplier of the product."
-        image={`${IMG}/vecteezy_autumn-themed-patchwork-quilt_70066206 1.png`}
         imageAlt="Brown fabric quilted in a fine diamond pattern"
         actions={
           <>
@@ -136,7 +167,7 @@ export default function QuiltedInsulationPage() {
 
             <Reveal direction="left" delay={0.1}>
               <dl className="rounded-xl bg-[#E9EAEC] p-6 sm:p-8">
-                {specs.map((spec) => (
+                {pageSpecs.map((spec) => (
                   <div
                     key={spec.label}
                     className="flex items-start justify-between gap-6 border-b border-brand-ink/10
@@ -179,7 +210,7 @@ export default function QuiltedInsulationPage() {
                         Suitable for industries including:
                       </h3>
                       <ul className="mt-3 space-y-1.5">
-                        {industries.map((industry) => (
+                        {pageIndustries.map((industry) => (
                           <li
                             key={industry}
                             className="relative pl-5 text-sm leading-relaxed text-brand-muted
@@ -267,7 +298,7 @@ export default function QuiltedInsulationPage() {
             className="mx-auto mt-8 flex max-w-3xl flex-wrap justify-center gap-2.5"
             delay={0.06}
           >
-            {fabrics.map((fabric) => (
+            {pageFabrics.map((fabric) => (
               <RevealItem key={fabric}>
                 <span className="inline-flex rounded-md bg-[#F2F2F3] px-3.5 py-2 text-[13px] text-brand-ink">
                   {fabric}
@@ -283,7 +314,7 @@ export default function QuiltedInsulationPage() {
               </Reveal>
 
               <RevealGroup className="mt-6 space-y-2.5" delay={0.06}>
-                {reasons.map((reason) => (
+                {pageReasons.map((reason) => (
                   <RevealItem key={reason}>
                     <p
                       className="relative pl-5 text-sm leading-relaxed text-brand-muted
@@ -340,11 +371,16 @@ export default function QuiltedInsulationPage() {
             <div className="mt-12 grid items-center gap-8 rounded-2xl bg-brand-cream px-6 py-10 sm:px-10 lg:grid-cols-2 lg:gap-12 lg:py-12">
               <div className="min-w-0">
                 <h2 className="text-2xl font-semibold sm:text-3xl">
-                  Quilted Fibreglass Or Polyester Wadding, Which Do You Need?
+                  {text(
+                    page?.bottom_cta_heading,
+                    'Quilted Fibreglass Or Polyester Wadding, Which Do You Need?'
+                  )}
                 </h2>
                 <p className="mt-5 max-w-md text-sm leading-relaxed text-brand-muted">
-                  We manufacture both, so we have no reason to push you toward either. The choice
-                  usually comes down to temperature, weight and cost.
+                  {text(
+                    page?.bottom_cta_text,
+                    'We manufacture both, so we have no reason to push you toward either. The choice usually comes down to temperature, weight and cost.'
+                  )}
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">

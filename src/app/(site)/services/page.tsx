@@ -1,10 +1,13 @@
-﻿import type { Metadata } from 'next'
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import PageHero from '@/components/layout/PageHero'
 import QuoteCta from '@/components/layout/QuoteCta'
 import Reveal, { RevealGroup, RevealItem } from '@/components/motion/Reveal'
-import { services } from '@/lib/services'
+import { services as fallbackServices } from '@/lib/services'
+import { getServices, getServicesPage } from '@/lib/cms/queries'
+import { imageSrc, text } from '@/lib/cms/fallbacks'
+import { resolveIcon } from '@/lib/cms/icons'
 
 export const metadata: Metadata = {
   title: 'Quilting Services — A.N. Standard Ltd.',
@@ -19,14 +22,28 @@ const intro = [
   'We can advise which patterns work best with the different weights of wadding. The thicker the wadding the bigger the pattern will need to be',
 ]
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const [page, dbServices] = await Promise.all([getServicesPage(), getServices()])
+
+  const services =
+    dbServices.length > 0
+      ? dbServices.map((service) => ({
+          title: service.title,
+          body: service.listing_card_teaser,
+          href: `/services/${service.slug}`,
+          image: imageSrc(service.listing_card_image) ?? '/images/services/Rectangle 29.png',
+          alt: text(service.listing_card_alt, service.title),
+          icon: resolveIcon(service.icon),
+        }))
+      : fallbackServices
+
   return (
     <>
       <PageHero
         align="left"
-        title="Quilting Services"
-        intro="Multi-needle lock stitch quilting on machines we have been running, maintaining and modifying since 1975."
-        image="/images/services/vecteezy_autumn-themed-patchwork-quilt_70066206 1.png"
+        title={text(page?.hero_heading, 'Quilting Services')}
+        intro={text(page?.hero_intro, 'Multi-needle lock stitch quilting on machines we have been running, maintaining and modifying since 1975.')}
+        image={imageSrc(page?.hero_image) ?? '/images/services/vecteezy_autumn-themed-patchwork-quilt_70066206 1.png'}
         imageAlt="Red quilted fabric running through a multi-needle quilting machine"
       />
 

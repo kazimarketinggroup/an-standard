@@ -4,7 +4,10 @@ import Link from 'next/link'
 import QuoteCta from '@/components/layout/QuoteCta'
 import PatternSwatch from '@/components/patterns/PatternSwatch'
 import Reveal, { RevealGroup, RevealItem } from '@/components/motion/Reveal'
-import { patterns } from '@/lib/patterns'
+import { patterns as fallbackPatterns } from '@/lib/patterns'
+import type { PatternKind } from '@/components/patterns/PatternSwatch'
+import { getPatterns, getPatternsPage } from '@/lib/cms/queries'
+import { imageSrc, text } from '@/lib/cms/fallbacks'
 
 export const metadata: Metadata = {
   title: 'Quilting Patterns — A.N. Standard Ltd.',
@@ -12,7 +15,26 @@ export const metadata: Metadata = {
     'Box, diamond, wavy, vertical, hourglass and bespoke quilting patterns. Every pattern below is running on our machines now.',
 }
 
-export default function PatternsPage() {
+export default async function PatternsPage() {
+  const [page, dbPatterns] = await Promise.all([getPatternsPage(), getPatterns()])
+
+  const patterns =
+    dbPatterns.length > 0
+      ? dbPatterns.map((pattern) => ({
+          slug: pattern.slug,
+          title: pattern.title,
+          kind: (pattern.kind || 'box') as PatternKind,
+          sizes: pattern.listing_subtitle,
+          body: pattern.listing_teaser,
+        }))
+      : fallbackPatterns.map((pattern) => ({
+          slug: pattern.slug,
+          title: pattern.title,
+          kind: pattern.kind,
+          sizes: pattern.sizes,
+          body: pattern.body,
+        }))
+
   return (
     <>
       {/* Hero: centred copy over a darkened quilted photo. */}

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { collectionMeta, isCollectionKey } from '@/lib/cms/admin-nav'
 import { collectionSchema, fieldsOf, emptyValue } from '@/lib/cms/schema'
 import ItemEditor from './ItemEditor'

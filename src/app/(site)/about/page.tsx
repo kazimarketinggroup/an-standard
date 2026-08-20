@@ -5,6 +5,9 @@ import PageHero from '@/components/layout/PageHero'
 import QuoteCta from '@/components/layout/QuoteCta'
 import { RevealGroup, RevealItem } from '@/components/motion/Reveal'
 import { ArrowRightIcon } from '@/components/ui/Icons'
+import { getAboutPage, getAboutSubpages } from '@/lib/cms/queries'
+import { imageSrc, list, text } from '@/lib/cms/fallbacks'
+import { multiline } from '@/lib/cms/render'
 
 export const metadata: Metadata = {
   title: 'About Us — A.N. Standard Ltd.',
@@ -19,7 +22,7 @@ const stats = [
   { label: 'UK-sourced wadding', value: 'held in stock' },
 ]
 
-const cards = [
+const FALLBACK_CARDS = [
   {
     title: 'Our story',
     body: 'Send us your fabric and filling. We quilt it to your pattern and send it back.',
@@ -50,22 +53,31 @@ const cards = [
   },
 ]
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [page, subpages] = await Promise.all([getAboutPage(), getAboutSubpages()])
+
+  const cards =
+    subpages.length > 0
+      ? subpages.map((sub) => ({
+          title: sub.title,
+          body: sub.teaser,
+          href: `/about/${sub.slug}`,
+          image: imageSrc(sub.listing_image) ?? '/images/about/Rectangle 29.png',
+          alt: sub.title,
+        }))
+      : FALLBACK_CARDS
+
+  const heroStats = list(page?.stat_badges).length ? list(page?.stat_badges) : stats
+
   return (
     <>
       <PageHero
         seal
-        title={
-          <>
-            Fifty Years,
-            <br />
-            Three Generations
-          </>
-        }
-        intro="A.N Standard was established in 1975 as a family business, and it has stayed one."
-        image="/images/about/vecteezy_autumn-themed-patchwork-quilt_70066206 1.png"
+        title={multiline(text(page?.hero_heading, 'Fifty Years,\nThree Generations'))}
+        intro={text(page?.hero_intro, 'A.N Standard was established in 1975 as a family business, and it has stayed one.')}
+        image={imageSrc(page?.hero_image) ?? '/images/about/vecteezy_autumn-themed-patchwork-quilt_70066206 1.png'}
         imageAlt="Spools of coloured thread arranged in a spiral"
-        stats={stats}
+        stats={heroStats}
       />
 
       <section className="section bg-[#F2F2F3]">

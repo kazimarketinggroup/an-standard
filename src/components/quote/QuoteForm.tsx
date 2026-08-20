@@ -61,10 +61,24 @@ const INITIAL: FormState = {
   notes: '',
 }
 
-export default function QuoteForm() {
+/**
+ * Only the wording is configurable. The fields, validation and submission
+ * behaviour stay in code, so editing content cannot break the form.
+ */
+export default function QuoteForm({
+  stepLabels,
+  successHeading,
+  successText,
+}: {
+  stepLabels?: string[]
+  successHeading?: string
+  successText?: string
+} = {}) {
   const [step, setStep] = useState(0)
   const [data, setData] = useState<FormState>(INITIAL)
   const [submitted, setSubmitted] = useState(false)
+
+  const labels = stepLabels && stepLabels.length === STEPS.length ? stepLabels : STEPS
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setData((prev) => ({ ...prev, [key]: value }))
@@ -82,14 +96,22 @@ export default function QuoteForm() {
   if (submitted) {
     return (
       <div className="rounded-2xl bg-brand-cream p-8 text-center sm:p-12">
-        <h2 className="text-xl font-semibold text-brand-ink sm:text-2xl">Thanks — that’s with us</h2>
-        <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-brand-muted">
-          We’ll come back to you with a price. If it’s urgent, call{' '}
-          <a href="tel:01215558101" className="font-medium text-brand-red">
-            0121 555 8101
-          </a>{' '}
-          and we’ll talk it through.
-        </p>
+        <h2 className="text-xl font-semibold text-brand-ink sm:text-2xl">
+          {successHeading || 'Thanks — that’s with us'}
+        </h2>
+        {successText ? (
+          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-brand-muted">
+            {successText}
+          </p>
+        ) : (
+          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-brand-muted">
+            We’ll come back to you with a price. If it’s urgent, call{' '}
+            <a href="tel:01215558101" className="font-medium text-brand-red">
+              0121 555 8101
+            </a>{' '}
+            and we’ll talk it through.
+          </p>
+        )}
         <button
           type="button"
           onClick={() => {
@@ -109,7 +131,7 @@ export default function QuoteForm() {
     <div className="rounded-2xl bg-brand-cream p-6 shadow-card sm:p-8 lg:p-10">
       {/* Progress: a filled bar plus a label per step. */}
       <ol className="mb-8 grid grid-cols-3 gap-2">
-        {STEPS.map((label, i) => {
+        {labels.map((label, i) => {
           const done = i <= step
           return (
             <li key={label}>

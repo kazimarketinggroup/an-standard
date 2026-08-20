@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { isSingletonKey, singletonMeta } from '@/lib/cms/admin-nav'
 import { singletonSchema, fieldsOf, emptyValue } from '@/lib/cms/schema'
 import SingletonEditor from './SingletonEditor'

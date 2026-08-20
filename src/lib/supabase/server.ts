@@ -1,10 +1,12 @@
 import { cookies } from 'next/headers'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
 /**
- * Session-aware server client, for reading the signed-in admin in server
- * components, route handlers and middleware-adjacent code.
+ * Session-aware server client, for reading the signed-in admin.
+ *
+ * This module imports `next/headers`, so it can only be reached from code that
+ * is never part of a Client Component's import graph. The cookie-free clients
+ * live in ./admin for everything else.
  */
 export function createClient() {
   const cookieStore = cookies()
@@ -37,29 +39,4 @@ export function createClient() {
   )
 }
 
-/**
- * Anonymous read-only client for public pages. No cookies, so pages using it
- * stay cacheable; RLS still limits it to the public read policies.
- */
-export function createPublicClient() {
-  return createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } }
-  )
-}
-
-/**
- * Service-role client. Bypasses RLS, so it must only ever run server-side —
- * never import this from a client component.
- */
-export function createAdminClient() {
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!key) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set')
-  }
-
-  return createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  })
-}
+export { createAdminClient, createPublicClient } from './admin'

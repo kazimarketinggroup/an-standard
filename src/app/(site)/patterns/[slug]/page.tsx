@@ -6,6 +6,7 @@ import QuoteCta from '@/components/layout/QuoteCta'
 import PatternSwatch from '@/components/patterns/PatternSwatch'
 import Reveal from '@/components/motion/Reveal'
 import { getPattern, getPatterns } from '@/lib/cms/queries'
+import { fallbackPatterns } from '@/lib/cms/pattern-fallback'
 import { imageSrc, list, stringList, text } from '@/lib/cms/fallbacks'
 import type { PatternKind } from '@/components/patterns/PatternSwatch'
 
@@ -14,11 +15,14 @@ type Params = { params: { slug: string } }
 /** One static page per pattern, so the whole set prerenders. */
 export async function generateStaticParams() {
   const patterns = await getPatterns()
-  return patterns.map((pattern) => ({ slug: pattern.slug }))
+  const list = patterns.length > 0 ? patterns : fallbackPatterns()
+  return list.map((pattern) => ({ slug: pattern.slug }))
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const pattern = await getPattern(params.slug)
+  const pattern =
+    (await getPattern(params.slug)) ??
+    fallbackPatterns().find((p) => p.slug === params.slug)
   if (!pattern) return {}
 
   return {
@@ -28,9 +32,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default async function PatternDetailPage({ params }: Params) {
-  const [pattern, allPatterns] = await Promise.all([getPattern(params.slug), getPatterns()])
+  const [dbPattern, dbPatterns] = await Promise.all([getPattern(params.slug), getPatterns()])
+
+  // Fall back to the original list until the database is seeded.
+  const pattern = dbPattern ?? fallbackPatterns().find((p) => p.slug === params.slug)
   if (!pattern) notFound()
 
+  const allPatterns = dbPatterns.length > 0 ? dbPatterns : fallbackPatterns()
   const others = allPatterns.filter((p) => p.slug !== pattern.slug)
   const specs = list(pattern.specs)
   const sampleList = stringList(pattern.sample_list)

@@ -4,6 +4,8 @@ import Link from 'next/link'
 import PageHero from '@/components/layout/PageHero'
 import QuoteCta from '@/components/layout/QuoteCta'
 import Reveal, { RevealGroup, RevealItem } from '@/components/motion/Reveal'
+import { getProcessPage } from '@/lib/cms/queries'
+import { imageSrc, list, text } from '@/lib/cms/fallbacks'
 
 export const metadata: Metadata = {
   title: 'Our Quilting Process — A.N. Standard Ltd.',
@@ -19,7 +21,7 @@ const STEP_IMAGE = (n: number) =>
     n === 0 ? '' : ` (${n})`
   }.png`
 
-const processSteps = [
+const FALLBACK_STEPS = [
   {
     title: 'Fabric in',
     description: 'Your fabric arrives, is rerolled if it needs to be, and is allocated to a machine.',
@@ -59,14 +61,27 @@ const processSteps = [
   },
 ]
 
-export default function ProcessPage() {
+export default async function ProcessPage() {
+  const page = await getProcessPage()
+
+  const dbSteps = list(page?.steps)
+  const processSteps =
+    dbSteps.length > 0
+      ? dbSteps.map((step, i) => ({
+          title: step.title,
+          description: step.description,
+          image: imageSrc(step.image) ?? STEP_IMAGE(i),
+          alt: step.title,
+        }))
+      : FALLBACK_STEPS
+
   return (
     <>
       <PageHero
         align="left"
-        title="From Fabric Arriving To Despatch"
-        intro="Every order follows the same careful steps. Each one handled by hand, checked at every stage, and finished to a standard that keeps customers coming back."
-        image={`${IMG}/vecteezy_autumn-themed-patchwork-quilt_70066206 1.png`}
+        title={text(page?.hero_heading, 'From Fabric Arriving To Despatch')}
+        intro={text(page?.hero_intro, 'Every order follows the same careful steps. Each one handled by hand, checked at every stage, and finished to a standard that keeps customers coming back.')}
+        image={imageSrc(page?.hero_image) ?? `${IMG}/vecteezy_autumn-themed-patchwork-quilt_70066206 1.png`}
         imageAlt="Quilted fabric running under the needle bar of a long-arm machine"
         actions={
           <>

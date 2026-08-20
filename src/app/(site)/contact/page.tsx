@@ -10,6 +10,9 @@ import {
   YouTubeIcon,
 } from '@/components/ui/Icons'
 import { site } from '@/lib/site'
+import { getContactPage } from '@/lib/cms/queries'
+import { imageSrc, text } from '@/lib/cms/fallbacks'
+import { multiline } from '@/lib/cms/render'
 
 export const metadata: Metadata = {
   title: 'Contact Us — A.N. Standard Ltd.',
@@ -25,7 +28,9 @@ const socials = [
   { label: 'YouTube', href: 'https://youtube.com', Icon: YouTubeIcon },
 ]
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const page = await getContactPage()
+
   return (
     <section className="relative isolate overflow-hidden bg-brand-ink">
       <Image
@@ -44,15 +49,14 @@ export default function ContactPage() {
           <div>
             <Reveal>
               <h1 className="text-3xl font-semibold text-white sm:text-4xl lg:text-5xl">
-                Contact Us
+                {text(page?.heading, 'Contact Us')}
               </h1>
             </Reveal>
 
             <Reveal delay={0.1}>
               <p className="mt-6 text-sm text-white/85">We’d love to hear from you!</p>
               <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70">
-                Whether you have a question about our custom quilting services, need help with an
-                order, or want to explore a partnership opportunity, our team is here to help.
+                {text(page?.intro_text, 'Whether you have a question about our custom quilting services, need help with an order, or want to explore a partnership opportunity, our team is here to help.')}
               </p>
             </Reveal>
 
@@ -60,7 +64,7 @@ export default function ContactPage() {
               <div className="mt-8">
                 <h2 className="text-base font-semibold text-white">Address:</h2>
                 <address className="mt-2 max-w-md text-sm not-italic leading-relaxed text-white/70">
-                  {site.address.line1} {site.address.line2}
+                  {text(page?.address, `${site.address.line1} ${site.address.line2}`)}
                 </address>
 
                 <dl className="mt-5 space-y-1.5 text-sm text-white/70">
@@ -68,7 +72,7 @@ export default function ContactPage() {
                     <dt>Phone:</dt>
                     <dd>
                       <a href={site.phoneHref} className="transition-colors hover:text-white">
-                        {site.phone}
+                        {text(page?.phone, site.phone)}
                       </a>
                     </dd>
                   </div>
@@ -81,7 +85,7 @@ export default function ContactPage() {
                         rel="noopener noreferrer"
                         className="transition-colors hover:text-white"
                       >
-                        {site.whatsapp}
+                        {text(page?.whatsapp, site.whatsapp)}
                       </a>
                     </dd>
                   </div>
@@ -89,7 +93,7 @@ export default function ContactPage() {
                     <dt>Email:</dt>
                     <dd>
                       <a href={site.emailHref} className="transition-colors hover:text-white">
-                        {site.email}
+                        {text(page?.email, site.email)}
                       </a>
                     </dd>
                   </div>
@@ -101,9 +105,12 @@ export default function ContactPage() {
               <div className="mt-8">
                 <h2 className="text-base font-semibold text-white">Business Hours</h2>
                 <p className="mt-2 text-sm leading-relaxed text-white/70">
-                  Monday – Friday: 9:00 AM – 5:00 PM
-                  <br />
-                  Closed on weekends and public holidays.
+                  {multiline(
+                    text(
+                      page?.business_hours_text,
+                      'Monday – Friday: 9:00 AM – 5:00 PM\nClosed on weekends and public holidays.'
+                    )
+                  )}
                 </p>
               </div>
             </Reveal>

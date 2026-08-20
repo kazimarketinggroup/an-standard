@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import NavigationEditor from './NavigationEditor'
 
 export const dynamic = 'force-dynamic'

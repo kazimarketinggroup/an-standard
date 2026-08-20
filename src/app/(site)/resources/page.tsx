@@ -1,10 +1,12 @@
-﻿import type { Metadata } from 'next'
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import PageHero from '@/components/layout/PageHero'
 import QuoteCta from '@/components/layout/QuoteCta'
 import Reveal, { RevealGroup, RevealItem } from '@/components/motion/Reveal'
 import { ArrowRightIcon } from '@/components/ui/Icons'
+import { getResourceArticles, getResourcesPage } from '@/lib/cms/queries'
+import { imageSrc, text } from '@/lib/cms/fallbacks'
 
 export const metadata: Metadata = {
   title: 'Resources and Guides — A.N. Standard Ltd.',
@@ -12,7 +14,7 @@ export const metadata: Metadata = {
     'Practical guides for specifying commission quilting — wadding weights, pattern selection and roll widths.',
 }
 
-const guides = [
+const FALLBACK_GUIDES = [
   {
     title: 'Choosing a wadding weight',
     body: 'Heavier is not better — it is only better when the pattern is sized to carry it.',
@@ -36,14 +38,27 @@ const guides = [
   },
 ]
 
-export default function ResourcesPage() {
+export default async function ResourcesPage() {
+  const [page, articles] = await Promise.all([getResourcesPage(), getResourceArticles()])
+
+  const guides =
+    articles.length > 0
+      ? articles.map((article) => ({
+          title: article.title,
+          body: article.listing_teaser,
+          href: `/resources/${article.slug}`,
+          image: imageSrc(article.listing_image) ?? '/images/resources/Rectangle 13.png',
+          alt: article.title,
+        }))
+      : FALLBACK_GUIDES
+
   return (
     <>
       <PageHero
         align="left"
-        title="Resources And Guides"
-        intro="Practical guides for specifying commission quilting — wadding weights, pattern selection and roll widths."
-        image="/images/resources/vecteezy_autumn-themed-patchwork-quilt_70066206 1.png"
+        title={text(page?.hero_heading, 'Resources And Guides')}
+        intro={text(page?.hero_intro, 'Practical guides for specifying commission quilting — wadding weights, pattern selection and roll widths.')}
+        image={imageSrc(page?.hero_image) ?? '/images/resources/vecteezy_autumn-themed-patchwork-quilt_70066206 1.png'}
         imageAlt="Close-up of the drive mechanism on a quilting machine"
       />
 
