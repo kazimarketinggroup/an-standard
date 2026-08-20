@@ -1,5 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { getHomePage, getServices } from '@/lib/cms/queries'
+import { text } from '@/lib/cms/fallbacks'
 import Reveal, { RevealGroup, RevealItem } from '../motion/Reveal'
 import { ArrowRightIcon } from '../ui/Icons'
 
@@ -12,7 +14,7 @@ type Service = {
   cta: string
 }
 
-const services: Service[] = [
+const FALLBACK_SERVICES: Service[] = [
   {
     title: 'Commission quilting',
     body: 'Send us your fabric and filling. We quilt it to your pattern and send it back.',
@@ -130,27 +132,56 @@ function ServiceCard({ service }: { service: Service }) {
   )
 }
 
-export default function Services() {
+/** Always appended after the services from the CMS. */
+const PROCESS_CARD: Service = {
+  title: 'Our Process',
+  body: 'From first sample to final delivery — see how a job moves through the workshop, and what to expect at each stage.',
+  href: '/process',
+  image: '',
+  cta: 'See Our Process',
+}
+
+export default async function Services() {
+  const [home, dbServices] = await Promise.all([getHomePage(), getServices()])
+
+  const services: Service[] =
+    dbServices.length > 0
+      ? [
+          ...dbServices.map((service) => ({
+            title: service.title,
+            body: service.listing_card_teaser,
+            href: `/services/${service.slug}`,
+            image: service.listing_card_image,
+            cta: 'Learn More',
+          })),
+          PROCESS_CARD,
+        ]
+      : FALLBACK_SERVICES
+
   return (
     <section className="section bg-white">
       <div className="container">
         <Reveal>
           <h2 className="max-w-3xl text-2xl font-semibold sm:text-3xl lg:text-[2rem]">
-            Quilting, from a single roll to a full production run
+            {text(
+              home?.services_intro_heading,
+              'Quilting, from a single roll to a full production run'
+            )}
           </h2>
         </Reveal>
 
         <Reveal delay={0.1}>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-brand-muted">
-            We quilt fabric on multi-needle lock stitch machines. Lock stitch gives a stronger, more
-            stable stitch than the alternatives, which matters when the finished product has to
-            survive laundering, wear, or years of use.
+            {text(
+              home?.services_intro_text,
+              'We quilt fabric on multi-needle lock stitch machines. Lock stitch gives a stronger, more stable stitch than the alternatives, which matters when the finished product has to survive laundering, wear, or years of use.'
+            )}
           </p>
         </Reveal>
 
         <RevealGroup className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" delay={0.1}>
           {services.map((service) => (
-            <RevealItem key={service.title}>
+            <RevealItem key={service.href}>
               <ServiceCard service={service} />
             </RevealItem>
           ))}

@@ -34,7 +34,17 @@ import type {
  * client ever empties a table.
  */
 
+/**
+ * True once the public Supabase credentials exist. Before that every read is
+ * skipped silently: the site renders from its fallbacks, and the build log
+ * stays free of one error per table per page.
+ */
+const isConfigured =
+  Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+  Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+
 async function fetchSingleton<T>(table: string): Promise<T | null> {
+  if (!isConfigured) return null
   try {
     const supabase = createPublicClient()
     const { data, error } = await supabase.from(table).select('*').eq('id', 1).maybeSingle()
@@ -50,6 +60,7 @@ async function fetchSingleton<T>(table: string): Promise<T | null> {
 }
 
 async function fetchCollection<T>(table: string, orderBy = 'sort_order'): Promise<T[]> {
+  if (!isConfigured) return []
   try {
     const supabase = createPublicClient()
     const { data, error } = await supabase.from(table).select('*').order(orderBy)
@@ -65,6 +76,7 @@ async function fetchCollection<T>(table: string, orderBy = 'sort_order'): Promis
 }
 
 async function fetchBySlug<T>(table: string, slug: string): Promise<T | null> {
+  if (!isConfigured) return null
   try {
     const supabase = createPublicClient()
     const { data, error } = await supabase

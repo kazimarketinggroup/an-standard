@@ -1,8 +1,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { getHomePage } from '@/lib/cms/queries'
+import { text } from '@/lib/cms/fallbacks'
 import Reveal from '../motion/Reveal'
 
-export default function ContactCta() {
+export default async function ContactCta() {
+  const home = await getHomePage()
+
   return (
     <section className="section bg-white">
       <div className="container">
@@ -10,12 +14,13 @@ export default function ContactCta() {
           <Reveal direction="right" className="h-full">
             <div className="flex h-full flex-col justify-center overflow-hidden rounded-2xl bg-brand-navy p-8 sm:p-12 lg:p-14">
               <h2 className="text-2xl font-semibold leading-tight text-white sm:text-3xl">
-                Tell us what you need quilting
+                {text(home?.quote_cta_heading, 'Tell us what you need quilting')}
               </h2>
               <p className="mt-5 max-w-md text-sm leading-relaxed text-white/70">
-                Send us your fabric type, filling, width and quantity and we’ll come back with a
-                price. If you’re not sure what you need, call us — that conversation is usually
-                quicker than a form.
+                {text(
+                  home?.quote_cta_text,
+                  'Send us your fabric type, filling, width and quantity and we’ll come back with a price. If you’re not sure what you need, call us — that conversation is usually quicker than a form.'
+                )}
               </p>
               <div>
                 <Link href="/quote" className="btn-primary mt-8">

@@ -1,16 +1,14 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import Reveal from '../motion/Reveal'
-import { patterns as patternList } from '../../lib/patterns'
+import { getHomePage, getPatterns } from '@/lib/cms/queries'
+import { text } from '@/lib/cms/fallbacks'
+import { multiline } from '@/lib/cms/render'
+import { patterns as fallbackPatterns } from '../../lib/patterns'
 
-/** Marquee cards, drawn from the shared pattern list so links stay in step. */
-const patterns = patternList.map((pattern) => ({
-  name: pattern.title,
-  image: pattern.image,
-  href: `/patterns/${pattern.slug}`,
-}))
+type MarqueeCard = { name: string; image: string; href: string }
 
-function PatternCard({ pattern }: { pattern: (typeof patterns)[number] }) {
+function PatternCard({ pattern }: { pattern: MarqueeCard }) {
   return (
     <Link
       href={pattern.href}
@@ -35,7 +33,22 @@ function PatternCard({ pattern }: { pattern: (typeof patterns)[number] }) {
   )
 }
 
-export default function Patterns() {
+export default async function Patterns() {
+  const [home, dbPatterns] = await Promise.all([getHomePage(), getPatterns()])
+
+  const patterns: MarqueeCard[] =
+    dbPatterns.length > 0
+      ? dbPatterns.map((pattern) => ({
+          name: pattern.title,
+          image: pattern.pattern_image,
+          href: `/patterns/${pattern.slug}`,
+        }))
+      : fallbackPatterns.map((pattern) => ({
+          name: pattern.title,
+          image: pattern.image,
+          href: `/patterns/${pattern.slug}`,
+        }))
+
   return (
     <section className="section relative isolate overflow-hidden bg-brand-ink">
       <Image
@@ -54,8 +67,12 @@ export default function Patterns() {
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <Reveal className="max-w-lg">
               <h2 className="text-2xl font-semibold leading-tight text-white sm:text-3xl lg:text-[2rem]">
-                Choose from our pattern
-                <br className="hidden sm:block" /> book, or bring your own
+                {multiline(
+                  text(
+                    home?.patterns_heading,
+                    'Choose from our pattern\n book, or bring your own'
+                  )
+                )}
               </h2>
             </Reveal>
 
@@ -68,9 +85,10 @@ export default function Patterns() {
 
           <Reveal delay={0.15}>
             <p className="mt-5 max-w-2xl text-sm leading-relaxed text-white/60">
-              Box, diamond, hourglass, vertical and wavy lines — in a range of sizes, with thread
-              matched or deliberately contrasted. Heavier waddings need larger patterns, and we’ll
-              tell you which combinations work before you commit to a run.
+              {text(
+                home?.patterns_intro,
+                'Box, diamond, hourglass, vertical and wavy lines — in a range of sizes, with thread matched or deliberately contrasted. Heavier waddings need larger patterns, and we’ll tell you which combinations work before you commit to a run.'
+              )}
             </p>
           </Reveal>
         </div>

@@ -1,9 +1,23 @@
 import Image from 'next/image'
+import { getGlobalSettings, getHomePage } from '@/lib/cms/queries'
+import { stringList, text } from '@/lib/cms/fallbacks'
+import { multiline } from '@/lib/cms/render'
+import { site } from '@/lib/site'
 import Reveal from '../motion/Reveal'
-import { site } from '../../lib/site'
 import { PhoneIcon } from '../ui/Icons'
 
-export default function Heritage() {
+const FALLBACK_PARAGRAPHS = [
+  'Since then we’ve acquired another quilting company, which brought additional machines, additional patterns and more capacity than we’ve had at any point in our history. It also brought a second set of customers, some of whom had been with that business as long as ours had been with us.',
+  'What hasn’t changed is how the work is done. Machines are still threaded by hand. Every roll is still checked before it leaves. The people who answer the phone are the people who run the machines.',
+]
+
+export default async function Heritage() {
+  const [home, settings] = await Promise.all([getHomePage(), getGlobalSettings()])
+
+  const paragraphs = stringList(home?.history_paragraphs).length
+    ? stringList(home?.history_paragraphs)
+    : FALLBACK_PARAGRAPHS
+
   return (
     <section className="relative isolate overflow-hidden bg-brand-ink">
       <Image
@@ -19,32 +33,25 @@ export default function Heritage() {
         <div className="max-w-xl">
           <Reveal>
             <h2 className="text-2xl font-semibold leading-tight text-white sm:text-3xl lg:text-[2rem]">
-              Fifty years,
-              <br /> three generations
+              {multiline(text(home?.history_heading, 'Fifty years,\nthree generations'))}
             </h2>
           </Reveal>
 
-          <Reveal delay={0.12}>
-            <p className="mt-6 text-sm leading-relaxed text-white/70">
-              Since then we’ve acquired another quilting company, which brought additional machines,
-              additional patterns and more capacity than we’ve had at any point in our history. It
-              also brought a second set of customers, some of whom had been with that business as
-              long as ours had been with us.
-            </p>
-          </Reveal>
-
-          <Reveal delay={0.2}>
-            <p className="mt-5 text-sm leading-relaxed text-white/70">
-              What hasn’t changed is how the work is done. Machines are still threaded by hand. Every
-              roll is still checked before it leaves. The people who answer the phone are the people
-              who run the machines.
-            </p>
-          </Reveal>
+          {paragraphs.map((paragraph, i) => (
+            <Reveal key={i} delay={0.12 + i * 0.08}>
+              <p className={`${i === 0 ? 'mt-6' : 'mt-5'} text-sm leading-relaxed text-white/70`}>
+                {paragraph}
+              </p>
+            </Reveal>
+          ))}
 
           <Reveal delay={0.28}>
-            <a href={site.phoneHref} className="btn-outline mt-8">
+            <a
+              href={text(settings?.phone_href, site.phoneHref)}
+              className="btn-outline mt-8"
+            >
               <PhoneIcon className="h-4 w-4" />
-              {site.phone}
+              {text(settings?.header_phone, site.phone)}
             </a>
           </Reveal>
         </div>
