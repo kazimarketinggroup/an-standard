@@ -5,30 +5,36 @@ import { notFound } from 'next/navigation'
 import QuoteCta from '@/components/layout/QuoteCta'
 import PatternSwatch from '@/components/patterns/PatternSwatch'
 import Reveal from '@/components/motion/Reveal'
-import { patterns } from '@/lib/patterns'
+import { getPattern, getPatterns } from '@/lib/cms/queries'
+import { imageSrc, list, stringList, text } from '@/lib/cms/fallbacks'
+import type { PatternKind } from '@/components/patterns/PatternSwatch'
 
 type Params = { params: { slug: string } }
 
 /** One static page per pattern, so the whole set prerenders. */
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const patterns = await getPatterns()
   return patterns.map((pattern) => ({ slug: pattern.slug }))
 }
 
-export function generateMetadata({ params }: Params): Metadata {
-  const pattern = patterns.find((p) => p.slug === params.slug)
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const pattern = await getPattern(params.slug)
   if (!pattern) return {}
 
   return {
-    title: `${pattern.title} — A.N. Standard Ltd.`,
-    description: pattern.body,
+    title: text(pattern.meta_title, `${pattern.title} — A.N. Standard Ltd.`),
+    description: text(pattern.meta_description, pattern.listing_teaser),
   }
 }
 
-export default function PatternDetailPage({ params }: Params) {
-  const pattern = patterns.find((p) => p.slug === params.slug)
+export default async function PatternDetailPage({ params }: Params) {
+  const [pattern, allPatterns] = await Promise.all([getPattern(params.slug), getPatterns()])
   if (!pattern) notFound()
 
-  const others = patterns.filter((p) => p.slug !== pattern.slug)
+  const others = allPatterns.filter((p) => p.slug !== pattern.slug)
+  const specs = list(pattern.specs)
+  const sampleList = stringList(pattern.sample_list)
+  const patternImage = imageSrc(pattern.pattern_image)
 
   return (
     <>
@@ -38,7 +44,7 @@ export default function PatternDetailPage({ params }: Params) {
        */}
       <section className="relative isolate overflow-hidden bg-brand-cream">
         <PatternSwatch
-          kind={pattern.kind}
+          kind={(pattern.kind || 'box') as PatternKind}
           className="absolute inset-0 h-full w-full opacity-40"
         />
         <div className="absolute inset-0 bg-brand-cream/55" />
@@ -46,14 +52,14 @@ export default function PatternDetailPage({ params }: Params) {
         {/* Matches the 600px hero height used by PageHero and the home hero. */}
         <div className="container relative flex min-h-[600px] flex-col items-center justify-center py-14 text-center lg:py-16">
           <h1 className="hero-rise text-3xl font-semibold leading-[1.15] sm:text-4xl lg:text-[40px]">
-            {pattern.title}
+            {text(pattern.hero_title, pattern.title)}
           </h1>
 
           <p
             className="hero-rise mt-4 max-w-xl text-sm leading-relaxed text-brand-muted"
             style={{ animationDelay: '0.15s' }}
           >
-            {pattern.body}
+            {text(pattern.hero_subtitle, pattern.listing_teaser)}
           </p>
 
           <div className="hero-rise mt-7" style={{ animationDelay: '0.25s' }}>
@@ -68,34 +74,17 @@ export default function PatternDetailPage({ params }: Params) {
         <div className="container">
           <Reveal>
             <h2 className="text-2xl font-semibold leading-[1.2] sm:text-[32px]">
-              About This Pattern
+              {text(pattern.about_heading, 'About This Pattern')}
             </h2>
           </Reveal>
 
           <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:gap-12">
             <div className="min-w-0 space-y-4">
-              <Reveal delay={0.06}>
-                <p className="text-sm leading-relaxed text-brand-muted">{pattern.sizes}</p>
-              </Reveal>
-              <Reveal delay={0.12}>
-                <p className="text-sm leading-relaxed text-brand-muted">{pattern.detail}</p>
-              </Reveal>
-              <Reveal delay={0.18}>
-                <p className="text-sm leading-relaxed text-brand-muted">
-                  Pattern choice is mostly a question of wadding weight. A tight grid holds a light
-                  filling flat and crisp; the same grid on a heavy filling crushes the loft you have
-                  paid for. We set the scale against the filling and the finished product, not
-                  against the drawing on its own.
-                </p>
-              </Reveal>
-              <Reveal delay={0.24}>
-                <p className="text-sm leading-relaxed text-brand-muted">
-                  Every pattern runs on multi-needle lock stitch machines at up to 2400mm wide, with
-                  thread matched to your fabric or deliberately contrasted where the stitch is part
-                  of the design. Settings are held on file under your name so a repeat order comes
-                  off the machine the same way.
-                </p>
-              </Reveal>
+              {stringList(pattern.about_paragraphs).map((paragraph, i) => (
+                <Reveal key={i} delay={0.06 + i * 0.06}>
+                  <p className="text-sm leading-relaxed text-brand-muted">{paragraph}</p>
+                </Reveal>
+              ))}
             </div>
 
             <Reveal direction="left" delay={0.1}>
@@ -103,12 +92,7 @@ export default function PatternDetailPage({ params }: Params) {
                 <h3 className="text-base font-semibold">Specification</h3>
 
                 <dl className="mt-4">
-                  {[
-                    { label: 'Sizes', value: pattern.sizes },
-                    { label: 'Suitable wadding', value: pattern.wadding },
-                    { label: 'Maximum width', value: '2400mm' },
-                    { label: 'Thread', value: 'Matching or contrasting' },
-                  ].map((row) => (
+                  {specs.map((row) => (
                     <div
                       key={row.label}
                       className="flex items-start justify-between gap-6 border-b border-brand-ink/10
@@ -121,8 +105,10 @@ export default function PatternDetailPage({ params }: Params) {
                 </dl>
 
                 <p className="mt-5 text-xs leading-relaxed text-brand-muted">
-                  Wadding guidance is a starting point, not a rule — we’ll quilt a sample panel
-                  before you commit to a run.
+                  {text(
+                    pattern.spec_note,
+                    'Wadding guidance is a starting point, not a rule — we’ll quilt a sample panel before you commit to a run.'
+                  )}
                 </p>
               </div>
             </Reveal>
@@ -130,36 +116,43 @@ export default function PatternDetailPage({ params }: Params) {
 
           {/* Sampling: fabric photo left, copy and checklist right. */}
           <div className="mt-14 grid items-start gap-8 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-12">
-            <Reveal>
-              <div className="relative aspect-[3/4] overflow-hidden rounded-xl">
-                <Image
-                  src={pattern.image}
-                  alt={`${pattern.title} on finished fabric`}
-                  fill
-                  sizes="(min-width: 1024px) 340px, 100vw"
-                  className="object-cover"
-                />
-              </div>
-            </Reveal>
+            {patternImage && (
+              <Reveal>
+                <div className="relative aspect-[3/4] overflow-hidden rounded-xl">
+                  <Image
+                    src={patternImage}
+                    alt={text(pattern.pattern_image_alt, `${pattern.title} on finished fabric`)}
+                    fill
+                    sizes="(min-width: 1024px) 340px, 100vw"
+                    className="object-cover"
+                  />
+                </div>
+              </Reveal>
+            )}
 
             <Reveal direction="left" delay={0.1}>
               <div className="min-w-0">
                 <h2 className="text-2xl font-semibold leading-[1.2] sm:text-[32px]">
-                  We sample before we run
+                  {text(pattern.sample_heading, 'We sample before we run')}
                 </h2>
 
                 <p className="mt-5 text-sm leading-relaxed text-brand-muted">
-                  Most pattern problems show up on a sample panel and cost almost nothing to fix
-                  there. Found mid-run, they cost a production quantity of fabric.
+                  {text(
+                    pattern.sample_intro,
+                    'Most pattern problems show up on a sample panel and cost almost nothing to fix there. Found mid-run, they cost a production quantity of fabric.'
+                  )}
                 </p>
 
                 <ul className="mt-5 space-y-2">
-                  {[
-                    'Scale checked against your wadding weight',
-                    'Repeat checked across the full roll width',
-                    'Thread and tension matched to your fabric',
-                    'Panel quilted for you to handle before production',
-                  ].map((item) => (
+                  {(sampleList.length
+                    ? sampleList
+                    : [
+                        'Scale checked against your wadding weight',
+                        'Repeat checked across the full roll width',
+                        'Thread and tension matched to your fabric',
+                        'Panel quilted for you to handle before production',
+                      ]
+                  ).map((item) => (
                     <li
                       key={item}
                       className="relative pl-5 text-sm leading-relaxed text-brand-muted
@@ -176,8 +169,10 @@ export default function PatternDetailPage({ params }: Params) {
                 </Link>
 
                 <p className="mt-7 border-t border-brand-ink/10 pt-7 text-sm leading-relaxed text-brand-ink">
-                  Send a drawing, a photograph or a sample — our computerised machines are not
-                  limited to the pattern book.
+                  {text(
+                    pattern.footer_note,
+                    'Send a drawing, a photograph or a sample — our computerised machines are not limited to the pattern book.'
+                  )}
                 </p>
               </div>
             </Reveal>
@@ -201,7 +196,7 @@ export default function PatternDetailPage({ params }: Params) {
                   >
                     <div className="relative aspect-[3/4]">
                       <Image
-                        src={other.image}
+                        src={other.pattern_image || '/images/home/Rectangle 32.png'}
                         alt={other.title}
                         fill
                         sizes="185px"

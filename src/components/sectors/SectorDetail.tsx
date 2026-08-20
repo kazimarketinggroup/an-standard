@@ -1,3 +1,4 @@
+import type { ComponentType, SVGProps } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import QuoteCta from '../layout/QuoteCta'
@@ -46,6 +47,18 @@ type SectorDetailProps = {
    * order, but most pages name the ones that share a material or a problem.
    */
   relatedHrefs?: string[]
+  /**
+   * Resolved cross-link cards. Supplied by the database-driven route; when
+   * absent the component falls back to the hardcoded sector list.
+   */
+  relatedSectors?: RelatedSector[]
+}
+
+export type RelatedSector = {
+  href: string
+  name: string
+  body: string
+  icon: ComponentType<SVGProps<SVGSVGElement>>
 }
 
 /**
@@ -65,15 +78,18 @@ export default function SectorDetail({
   fillings,
   evidence,
   relatedHrefs,
+  relatedSectors,
 }: SectorDetailProps) {
   // Named siblings where the page picks them, otherwise the next three in
   // order, wrapping around the list so every page shows a full row.
   const index = sectors.findIndex((sector) => sector.href === currentHref)
-  const related = relatedHrefs
-    ? (relatedHrefs
-        .map((href) => sectors.find((sector) => sector.href === href))
-        .filter(Boolean) as typeof sectors)
-    : Array.from({ length: 3 }, (_, i) => sectors[(index + i + 1) % sectors.length])
+  const related: RelatedSector[] =
+    relatedSectors ??
+    (relatedHrefs
+      ? (relatedHrefs
+          .map((href) => sectors.find((sector) => sector.href === href))
+          .filter(Boolean) as typeof sectors)
+      : Array.from({ length: 3 }, (_, i) => sectors[(index + i + 1) % sectors.length]))
 
   return (
     <>
