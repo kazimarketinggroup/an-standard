@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { collectionMeta, isCollectionKey } from '@/lib/cms/admin-nav'
+import { collectionGuide } from '@/lib/cms/guide'
 import CollectionList from './CollectionList'
 
 export const dynamic = 'force-dynamic'
@@ -23,6 +24,7 @@ export default async function CollectionPage({ params }: { params: { table: stri
       meta={meta}
       items={(data ?? []) as { id: string; slug: string; title: string; sort_order: number }[]}
       loadError={error?.message ?? ''}
+      guide={collectionGuide[table]}
     />
   )
 }

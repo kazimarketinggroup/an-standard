@@ -1,6 +1,7 @@
 'use client'
 
 import type { FieldGroup } from '@/lib/cms/schema'
+import type { PageGuide } from '@/lib/cms/guide'
 import { saveCollectionItem } from '../../../actions'
 import EditorForm from '../../../ui/EditorForm'
 
@@ -11,6 +12,7 @@ export default function ItemEditor({
   livePath,
   groups,
   initialValues,
+  guide,
   children,
 }: {
   table: string
@@ -19,6 +21,7 @@ export default function ItemEditor({
   livePath: string
   groups: FieldGroup[]
   initialValues: Record<string, unknown>
+  guide?: PageGuide
   children?: React.ReactNode
 }) {
   return (
@@ -27,6 +30,7 @@ export default function ItemEditor({
       livePath={livePath}
       groups={groups}
       initialValues={initialValues}
+      guide={guide}
       onSave={(values) => saveCollectionItem(table, id, values)}
     >
       {children}

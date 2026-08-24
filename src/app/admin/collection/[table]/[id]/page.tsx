@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { collectionMeta, isCollectionKey } from '@/lib/cms/admin-nav'
 import { collectionSchema, fieldsOf, emptyValue } from '@/lib/cms/schema'
+import { collectionGuide } from '@/lib/cms/guide'
 import ItemEditor from './ItemEditor'
 
 export const dynamic = 'force-dynamic'
@@ -38,6 +39,7 @@ export default async function CollectionItemPage({
       livePath={livePath}
       groups={groups}
       initialValues={values}
+      guide={collectionGuide[table]}
     >
       <Link
         href={`/admin/collection/${table}`}

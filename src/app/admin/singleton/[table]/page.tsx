@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { isSingletonKey, singletonMeta } from '@/lib/cms/admin-nav'
 import { singletonSchema, fieldsOf, emptyValue } from '@/lib/cms/schema'
+import { singletonGuide } from '@/lib/cms/guide'
 import SingletonEditor from './SingletonEditor'
 
 export const dynamic = 'force-dynamic'
@@ -46,6 +47,7 @@ export default async function SingletonPage({ params }: { params: { table: strin
       livePath={meta.livePath}
       groups={groups}
       initialValues={values}
+      guide={singletonGuide[table]}
       dynamicOptions={dynamicOptions}
     />
   )

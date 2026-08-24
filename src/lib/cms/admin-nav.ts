@@ -2,6 +2,9 @@
  * The admin sidebar, and the single source of truth for which CMS tables the
  * dashboard exposes. Collections are rendered by one generic list/edit screen
  * driven by these keys, so adding a section is a data change, not a new page.
+ *
+ * Labels are written for the client, not for a developer: they name what the
+ * thing is on the website, never the table behind it.
  */
 
 export type CollectionKey =
@@ -40,78 +43,60 @@ export type NavSection = {
 
 export const adminNav: NavSection[] = [
   {
-    title: 'Site-wide',
+    title: 'Start here',
     entries: [
-      { label: 'Global Settings', href: '/admin/global', livePath: '/' },
-      { label: 'Navigation', href: '/admin/navigation', livePath: '/' },
+      { label: 'Dashboard', href: '/admin' },
+      { label: 'Phone, email, address', href: '/admin/singleton/global_settings', livePath: '/' },
+      { label: 'Home page', href: '/admin/singleton/home_page', livePath: '/' },
     ],
   },
   {
-    title: 'Pages',
+    title: 'Your pages',
     entries: [
-      { label: 'Home', href: '/admin/singleton/home_page', livePath: '/' },
-      { label: 'Process', href: '/admin/singleton/process_page', livePath: '/process' },
-      { label: 'Contact', href: '/admin/singleton/contact_page', livePath: '/contact' },
-      { label: 'Quote', href: '/admin/singleton/quote_page', livePath: '/quote' },
-    ],
-  },
-  {
-    title: 'About',
-    entries: [
-      { label: 'About listing', href: '/admin/singleton/about_page', livePath: '/about' },
-      { label: 'About pages', href: '/admin/collection/about_subpages', livePath: '/about' },
-    ],
-  },
-  {
-    title: 'Services',
-    entries: [
-      { label: 'Services listing', href: '/admin/singleton/services_page', livePath: '/services' },
+      { label: 'Sectors', href: '/admin/collection/sectors', livePath: '/sectors' },
       { label: 'Services', href: '/admin/collection/services', livePath: '/services' },
+      { label: 'Patterns', href: '/admin/collection/patterns', livePath: '/patterns' },
+      {
+        label: 'Quilted Insulation',
+        href: '/admin/collection/insulation_subpages',
+        livePath: '/quilted-insulation',
+      },
+      { label: 'About', href: '/admin/collection/about_subpages', livePath: '/about' },
+      {
+        label: 'Resources',
+        href: '/admin/collection/resource_articles',
+        livePath: '/resources',
+      },
     ],
   },
   {
-    title: 'Quilted Insulation',
+    title: 'Single pages',
     entries: [
+      { label: 'Contact', href: '/admin/singleton/contact_page', livePath: '/contact' },
+      { label: 'Our process', href: '/admin/singleton/process_page', livePath: '/process' },
+      { label: 'Quote form', href: '/admin/singleton/quote_page', livePath: '/quote' },
+      { label: 'Legal pages', href: '/admin/collection/legal_pages' },
+    ],
+  },
+  {
+    title: 'Listing page headers',
+    entries: [
+      { label: 'About header', href: '/admin/singleton/about_page', livePath: '/about' },
+      { label: 'Services header', href: '/admin/singleton/services_page', livePath: '/services' },
+      { label: 'Sectors header', href: '/admin/singleton/sectors_page', livePath: '/sectors' },
+      { label: 'Patterns header', href: '/admin/singleton/patterns_page', livePath: '/patterns' },
       {
-        label: 'Insulation listing',
+        label: 'Insulation header',
         href: '/admin/singleton/insulation_page',
         livePath: '/quilted-insulation',
       },
       {
-        label: 'Insulation pages',
-        href: '/admin/collection/insulation_subpages',
-        livePath: '/quilted-insulation',
-      },
-    ],
-  },
-  {
-    title: 'Sectors',
-    entries: [
-      { label: 'Sectors listing', href: '/admin/singleton/sectors_page', livePath: '/sectors' },
-      { label: 'Sectors', href: '/admin/collection/sectors', livePath: '/sectors' },
-    ],
-  },
-  {
-    title: 'Patterns',
-    entries: [
-      { label: 'Patterns listing', href: '/admin/singleton/patterns_page', livePath: '/patterns' },
-      { label: 'Patterns', href: '/admin/collection/patterns', livePath: '/patterns' },
-    ],
-  },
-  {
-    title: 'Resources',
-    entries: [
-      {
-        label: 'Resources listing',
+        label: 'Resources header',
         href: '/admin/singleton/resources_page',
         livePath: '/resources',
       },
-      { label: 'Articles', href: '/admin/collection/resource_articles', livePath: '/resources' },
+      { label: 'Menus', href: '/admin/navigation', livePath: '/' },
     ],
-  },
-  {
-    title: 'Legal',
-    entries: [{ label: 'Legal pages', href: '/admin/collection/legal_pages', livePath: '/' }],
   },
 ]
 
@@ -129,7 +114,7 @@ export const collectionMeta: Record<
   sectors: { label: 'Sectors', singular: 'sector', basePath: '/sectors', canCreate: true },
   patterns: { label: 'Patterns', singular: 'pattern', basePath: '/patterns', canCreate: true },
   insulation_subpages: {
-    label: 'Insulation pages',
+    label: 'Quilted Insulation',
     singular: 'insulation page',
     basePath: '/quilted-insulation',
     canCreate: true,
@@ -152,17 +137,17 @@ export const collectionMeta: Record<
 }
 
 export const singletonMeta: Record<SingletonKey, { label: string; livePath: string }> = {
-  global_settings: { label: 'Global Settings', livePath: '/' },
-  home_page: { label: 'Home Page', livePath: '/' },
-  about_page: { label: 'About Listing', livePath: '/about' },
-  services_page: { label: 'Services Listing', livePath: '/services' },
-  insulation_page: { label: 'Insulation Listing', livePath: '/quilted-insulation' },
-  sectors_page: { label: 'Sectors Listing', livePath: '/sectors' },
-  patterns_page: { label: 'Patterns Listing', livePath: '/patterns' },
-  process_page: { label: 'Process Page', livePath: '/process' },
-  resources_page: { label: 'Resources Listing', livePath: '/resources' },
-  contact_page: { label: 'Contact Page', livePath: '/contact' },
-  quote_page: { label: 'Quote Page', livePath: '/quote' },
+  global_settings: { label: 'Phone, email and address', livePath: '/' },
+  home_page: { label: 'Home page', livePath: '/' },
+  about_page: { label: 'About page header', livePath: '/about' },
+  services_page: { label: 'Services page header', livePath: '/services' },
+  insulation_page: { label: 'Quilted Insulation page', livePath: '/quilted-insulation' },
+  sectors_page: { label: 'Sectors page header', livePath: '/sectors' },
+  patterns_page: { label: 'Patterns page header', livePath: '/patterns' },
+  process_page: { label: 'Our process page', livePath: '/process' },
+  resources_page: { label: 'Resources page header', livePath: '/resources' },
+  contact_page: { label: 'Contact page', livePath: '/contact' },
+  quote_page: { label: 'Quote form wording', livePath: '/quote' },
 }
 
 export function isCollectionKey(value: string): value is CollectionKey {
