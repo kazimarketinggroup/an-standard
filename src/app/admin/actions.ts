@@ -244,6 +244,11 @@ export async function saveNavItems(
 
 /* --- images --- */
 
+/**
+ * Backstop only. The admin compresses images in the browser before uploading
+ * (see lib/images/compress.ts), so reaching this limit means compression was
+ * skipped or failed — not that the client picked too large a file.
+ */
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/avif', 'image/svg+xml']
 
@@ -258,13 +263,25 @@ export async function uploadImage(
     return { ok: false, error: 'Choose a file to upload.' }
   }
   if (file.size > MAX_UPLOAD_BYTES) {
-    return { ok: false, error: 'That image is larger than 8MB. Please compress it first.' }
+    return {
+      ok: false,
+      error: 'That image is too large to upload, even after compressing. Please try another.',
+    }
   }
   if (!ALLOWED_TYPES.includes(file.type)) {
     return { ok: false, error: 'Images must be PNG, JPEG, WebP, AVIF or SVG.' }
   }
 
-  const extension = file.name.includes('.') ? file.name.split('.').pop()!.toLowerCase() : 'png'
+  // Derived from the type rather than the name: compression re-encodes a PNG
+  // photo as JPEG, and the stored extension has to follow the actual bytes.
+  const EXTENSION_BY_TYPE: Record<string, string> = {
+    'image/png': 'png',
+    'image/jpeg': 'jpg',
+    'image/webp': 'webp',
+    'image/avif': 'avif',
+    'image/svg+xml': 'svg',
+  }
+  const extension = EXTENSION_BY_TYPE[file.type] ?? 'png'
   const safeName = file.name
     .replace(/\.[^.]+$/, '')
     .toLowerCase()

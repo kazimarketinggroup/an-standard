@@ -42,7 +42,9 @@ will appear on its own.
 - **Text boxes** — type your wording. In large boxes, pressing Enter creates a
   genuine line break on the page, which is how the two-line headings work.
 - **Images** — click **Change image** and pick a file. It replaces the old one
-  straight away. Keep images under 8MB; JPEG, PNG or WebP.
+  straight away. Photos straight off a phone or camera are fine: they are
+  shrunk automatically before uploading, so you never need to resize anything
+  first. JPEG, PNG, WebP or SVG.
 - **Lists** (specification tables, bullet points, steps, galleries) — use
   **+ Add** for a new row, the **↑ ↓** buttons to reorder, and **×** to delete.
 - **Page title / Page description** — what Google shows in search results.
@@ -142,6 +144,22 @@ Points worth knowing before changing things:
   `revalidatePath` alone does *not* regenerate them — without the timer, a
   content edit would never reach the live site. Save still calls
   `revalidatePath('/', 'layout')`; the timer is what guarantees it lands.
+
+### Image uploads
+
+Every image field in the admin is the same `ImageField` component, and it runs
+`lib/images/compress.ts` in the browser before uploading. That keeps a 20MB
+phone photo from ever reaching Supabase Storage: the longest edge is capped at
+2000px and photographs are re-encoded as JPEG, stepping the quality down from
+80% until the file is under ~1.5MB.
+
+Transparency is decided by sampling the pixels, not by the file extension — an
+opaque PNG screenshot compresses as a photograph, while a PNG that genuinely
+uses its alpha channel stays lossless. SVGs are passed through untouched, and
+small images are never upscaled.
+
+The server's 8MB limit is a backstop for a browser that could not compress,
+not something the client is expected to work around.
 
 ### Every page is database-driven
 
