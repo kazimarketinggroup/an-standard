@@ -98,9 +98,13 @@ export default async function InsulationSubPage({ params }: { params: { slug: st
           ? {
               heading: text(comparison.heading, 'Compared side by side'),
               columns: comparison.columns as string[],
-              rows: (comparison.rows as { label: string; values: string[] }[]).map((row) => ({
+              // Rows are stored with `cells`; `values` is accepted too so a
+              // row hand-written in the admin either way still renders.
+              rows: (
+                comparison.rows as { label: string; cells?: string[]; values?: string[] }[]
+              ).map((row) => ({
                 label: row.label,
-                cells: row.values ?? [],
+                cells: row.cells ?? row.values ?? [],
               })),
             }
           : undefined
