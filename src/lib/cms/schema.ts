@@ -29,6 +29,8 @@ export type FieldType =
   | 'stepList'
   /** Repeatable list of { heading, paragraphs[] } article sections. */
   | 'sectionList'
+  /** Repeatable list of team members: name, job title, photo, bio. */
+  | 'teamList'
   /** Repeatable list of { label, href, style } buttons. */
   | 'buttonList'
 
@@ -648,6 +650,17 @@ export const collectionSchema: Record<CollectionKey, FieldGroup[]> = {
       title: 'Body',
       fields: [{ name: 'body_paragraphs', label: 'Paragraphs', type: 'stringList' }],
     },
+    {
+      title: 'Team photos',
+      fields: [
+        {
+          name: 'team_members',
+          label: 'Team members',
+          type: 'teamList',
+          help: 'Shown as a photo grid. Leave empty on pages that are not the team page.',
+        },
+      ],
+    },
     META_GROUP,
   ],
 
@@ -713,6 +726,7 @@ export function emptyValue(type: FieldType): unknown {
     case 'stepList':
     case 'sectionList':
     case 'buttonList':
+    case 'teamList':
       return []
     default:
       return ''

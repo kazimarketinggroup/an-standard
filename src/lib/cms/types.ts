@@ -34,6 +34,19 @@ export type ExtraSection = {
   items: (string | { title?: string; body?: string; label?: string; value?: string; items?: string[] })[]
 }
 
+/**
+ * One person in the team grid. Their order is the array position, which the
+ * admin's up/down buttons rewrite, so it is not stored on the item itself.
+ */
+export type TeamMember = {
+  name: string
+  designation: string
+  photo: string
+  photo_alt?: string
+  /** Optional; the published grid shows only the name and designation. */
+  bio?: string
+}
+
 export type ComparisonTable = {
   heading?: string
   columns?: string[]
@@ -320,6 +333,7 @@ export type AboutSubpage = {
   hero_heading: string
   hero_intro: string
   body_paragraphs: string[]
+  team_members: TeamMember[]
   meta_title: string
   meta_description: string
 }

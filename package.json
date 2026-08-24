@@ -8,9 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "tsx --env-file=.env.local scripts/seed.ts",
-    "create-admin": "tsx --env-file=.env.local scripts/create-admin.ts",
-    "migrate-legacy": "tsx --env-file=.env.local scripts/migrate-legacy.ts",
-    "extract-services": "node scripts/extract-services.mjs"
+    "create-admin": "tsx --env-file=.env.local scripts/create-admin.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

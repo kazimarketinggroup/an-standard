@@ -249,6 +249,61 @@ export default function FieldRenderer({ field, value, onChange, dynamicOptions }
         />
       )
 
+    case 'teamList':
+      return (
+        <RepeatableList<{
+          name: string
+          designation: string
+          photo: string
+          photo_alt?: string
+          bio?: string
+        }>
+          items={
+            list as {
+              name: string
+              designation: string
+              photo: string
+              photo_alt?: string
+              bio?: string
+            }[]
+          }
+          onChange={onChange}
+          makeEmpty={() => ({ name: '', designation: '', photo: '', photo_alt: '', bio: '' })}
+          addLabel="Add member"
+          renderItem={(item, update) => (
+            <div className="space-y-2">
+              <div className="grid gap-2 sm:grid-cols-2">
+                <input
+                  placeholder="Name"
+                  value={item?.name ?? ''}
+                  onChange={(e) => update({ ...item, name: e.target.value })}
+                  className={smallInputClass}
+                />
+                <input
+                  placeholder="Job title"
+                  value={item?.designation ?? ''}
+                  onChange={(e) => update({ ...item, designation: e.target.value })}
+                  className={smallInputClass}
+                />
+              </div>
+
+              <ImageField
+                value={item?.photo ?? ''}
+                onChange={(url) => update({ ...item, photo: url })}
+              />
+
+              <textarea
+                rows={2}
+                placeholder="Short description (optional)"
+                value={item?.bio ?? ''}
+                onChange={(e) => update({ ...item, bio: e.target.value })}
+                className={smallInputClass}
+              />
+            </div>
+          )}
+        />
+      )
+
     case 'sectionList':
       return (
         <RepeatableList<{ heading: string; paragraphs: string[] }>

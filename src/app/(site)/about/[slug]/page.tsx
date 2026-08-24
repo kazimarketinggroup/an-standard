@@ -3,8 +3,10 @@ import { notFound } from 'next/navigation'
 import PageHero from '@/components/layout/PageHero'
 import ProsePanel from '@/components/layout/ProsePanel'
 import QuoteCta from '@/components/layout/QuoteCta'
+import TeamGrid from '@/components/about/TeamGrid'
 import { getAboutSubpage, getAboutSubpages } from '@/lib/cms/queries'
-import { imageSrc, stringList, text } from '@/lib/cms/fallbacks'
+import { imageSrc, list, stringList, text } from '@/lib/cms/fallbacks'
+import type { TeamMember } from '@/lib/cms/types'
 
 /**
  * Revalidate on a timer as well as on save: pages built from
@@ -37,6 +39,7 @@ export default async function AboutSubPage({ params }: { params: { slug: string 
   if (!page) notFound()
 
   const paragraphs = stringList(page.body_paragraphs)
+  const team = list<TeamMember>(page.team_members).filter((member) => Boolean(member?.photo))
 
   return (
     <>
@@ -52,10 +55,13 @@ export default async function AboutSubPage({ params }: { params: { slug: string 
         imageAlt={text(page.hero_image_alt, page.title)}
       />
 
-      <section className="section bg-[#F2F2F3]">
+      {/* The team page's grid sits on cream; the prose pages use grey. */}
+      <section className={`section ${team.length > 0 ? 'bg-brand-cream' : 'bg-[#F2F2F3]'}`}>
         <div className="container">
           {paragraphs.length > 0 && <ProsePanel paragraphs={paragraphs} />}
-          <div className={paragraphs.length > 0 ? 'mt-12' : ''}>
+          {team.length > 0 && <TeamGrid members={team} />}
+
+          <div className={paragraphs.length > 0 || team.length > 0 ? 'mt-12' : ''}>
             <QuoteCta />
           </div>
         </div>
