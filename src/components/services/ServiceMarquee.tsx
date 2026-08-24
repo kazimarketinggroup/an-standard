@@ -13,15 +13,11 @@ export type MarqueeService = {
 
 type ServiceMarqueeProps = {
   currentHref: string
-  /**
-   * Optional only while the legacy hardcoded service pages still exist; they
-   * call this without the prop. Once they are gone this becomes required.
-   */
-  services?: MarqueeService[]
+  services: MarqueeService[]
 }
 
 export default function ServiceMarquee({ currentHref, services }: ServiceMarqueeProps) {
-  const otherServices = (services ?? []).filter((service) => service.href !== currentHref)
+  const otherServices = services.filter((service) => service.href !== currentHref)
 
   if (otherServices.length === 0) return null
 

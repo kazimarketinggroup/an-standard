@@ -10,7 +10,7 @@
     "seed": "tsx --env-file=.env.local scripts/seed.ts",
     "create-admin": "tsx --env-file=.env.local scripts/create-admin.ts",
     "migrate-legacy": "tsx --env-file=.env.local scripts/migrate-legacy.ts",
-    "migrate-services": "tsx --env-file=.env.local scripts/migrate-services.ts"
+    "extract-services": "node scripts/extract-services.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

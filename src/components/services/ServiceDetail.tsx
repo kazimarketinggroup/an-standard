@@ -23,7 +23,7 @@ export type ServiceDetailProps = {
   heroImageAlt: string
   heroButtons: HeroButton[]
   swatches: GalleryImage[]
-  bodyHeading: string
+  bodyHeading: React.ReactNode
   bodyParagraphs: string[]
   highlightHeading: string
   highlightText: string
