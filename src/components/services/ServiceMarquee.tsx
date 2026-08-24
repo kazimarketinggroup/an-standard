@@ -1,15 +1,29 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
-import { services } from '../../lib/services'
 import { ArrowRightIcon } from '../ui/Icons'
+
+export type MarqueeService = {
+  title: string
+  body: string
+  href: string
+  image: string
+  alt: string
+}
 
 type ServiceMarqueeProps = {
   currentHref: string
+  /**
+   * Optional only while the legacy hardcoded service pages still exist; they
+   * call this without the prop. Once they are gone this becomes required.
+   */
+  services?: MarqueeService[]
 }
 
-export default function ServiceMarquee({ currentHref }: ServiceMarqueeProps) {
-  const otherServices = services.filter((service) => service.href !== currentHref)
+export default function ServiceMarquee({ currentHref, services }: ServiceMarqueeProps) {
+  const otherServices = (services ?? []).filter((service) => service.href !== currentHref)
+
+  if (otherServices.length === 0) return null
 
   return (
     <div className="mt-16">

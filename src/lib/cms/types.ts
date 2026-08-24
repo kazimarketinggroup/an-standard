@@ -15,6 +15,25 @@ export type GalleryImage = { src: string; alt: string }
 export type HeroButton = { label: string; href: string; style: string }
 export type ProcessStep = { title: string; description: string; image?: string }
 export type BodySection = { heading: string; paragraphs: string[] }
+/**
+ * A page-specific block: a heading, optional intro, and a list. The four
+ * service pages that carry one each use a different item shape, so items are a
+ * union and `style` picks how the list renders.
+ *
+ *   bullets  — string[]        e.g. material limits
+ *   steps    — {title, body}   e.g. the pattern-design workflow
+ *   table    — {label, value}  e.g. the wadding weight guide
+ *   columns  — {title, items}  e.g. book pattern vs bespoke
+ */
+export type ExtraSectionStyle = 'bullets' | 'steps' | 'table' | 'columns' | 'text'
+
+export type ExtraSection = {
+  heading: string
+  intro?: string
+  style: ExtraSectionStyle
+  items: (string | { title?: string; body?: string; label?: string; value?: string; items?: string[] })[]
+}
+
 export type ComparisonTable = {
   heading?: string
   columns?: string[]
@@ -167,6 +186,30 @@ export type Service = {
   why_work_with_us: string[]
   video_thumbnail_image: string
   video_url: string
+  video_label: string
+  video_caption: string
+  side_image: string
+  side_image_alt: string
+  hero_buttons: HeroButton[]
+  swatches: GalleryImage[]
+  panel_heading: string
+  panel_intro: string
+  /** Plain strings for the bullet style; {label,value} pairs for pills. */
+  panel_list: (string | Spec)[]
+  panel_layout: string
+  panel_list_style: string
+  panel_left_image: string
+  panel_left_image_alt: string
+  panel_right_image: string
+  panel_right_image_alt: string
+  panel_footnote: string
+  panel_cta_label: string
+  panel_cta_href: string
+  fabrics_heading: string
+  fabrics_intro: string
+  why_heading: string
+  why_intro: string
+  extra_sections: ExtraSection[]
   meta_title: string
   meta_description: string
 }
@@ -248,6 +291,16 @@ export type InsulationSubpage = {
   specs: Spec[]
   panel_heading: string
   panel_body: string[]
+  panel_image: string
+  panel_image_alt: string
+  second_panel_heading: string
+  second_panel_body: string[]
+  second_panel_left_image: string
+  second_panel_left_image_alt: string
+  second_panel_image: string
+  second_panel_image_alt: string
+  second_panel_sub_heading: string
+  second_panel_sub_body: string[]
   comparison: ComparisonTable
   closing_heading: string
   closing_body: string[]

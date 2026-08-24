@@ -68,6 +68,31 @@ export default async function InsulationSubPage({ params }: { params: { slug: st
           ? stringList(page.closing_body)
           : undefined,
       }}
+      secondPanel={
+        page.second_panel_heading || stringList(page.second_panel_body).length
+          ? {
+              heading: page.second_panel_heading,
+              body: stringList(page.second_panel_body),
+              leftImage: imageSrc(page.second_panel_left_image)
+                ? {
+                    src: imageSrc(page.second_panel_left_image)!,
+                    alt: text(page.second_panel_left_image_alt),
+                  }
+                : undefined,
+              image: {
+                src:
+                  imageSrc(page.second_panel_image) ??
+                  imageSrc(page.hero_image) ??
+                  '/images/quilted-insultation/Rectangle 13.png',
+                alt: text(page.second_panel_image_alt, page.title),
+              },
+              secondHeading: page.second_panel_sub_heading || undefined,
+              secondBody: stringList(page.second_panel_sub_body).length
+                ? stringList(page.second_panel_sub_body)
+                : undefined,
+            }
+          : undefined
+      }
       comparison={
         hasComparison
           ? {
