@@ -5,8 +5,8 @@ export const site = {
   whatsapp: '+447949709412',
   // wa.me needs the number in bare international form — no +, no spaces.
   whatsappHref: 'https://wa.me/447949709412',
-  email: 'info@anstandardquilting.com',
-  emailHref: 'mailto:info@anstandardquilting.com',
+  email: 'info@standardquilting.com',
+  emailHref: 'mailto:info@standardquilting.com',
   hours: 'Opening hours (TBC)',
   address: {
     line1: 'Unit 11A, Parkrose Industrial Estate,',
