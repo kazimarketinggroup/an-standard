@@ -34,6 +34,7 @@ will appear on its own.
 | **Navigation** | The header menu, the footer's Company column, and the footer's legal links |
 | **Home / Process / Contact / Quote** | Each of those single pages |
 | **About / Services / Quilted Insulation / Sectors / Patterns / Resources** | The listing page, plus the individual pages inside each section |
+| **Our Team** | Under About. Each person has a name, job title, photo and an optional description; use the arrows to reorder them and **+ Add member** to add someone |
 | **Legal pages** | Privacy Policy, Responsible Disclosure, Terms |
 
 ### Editing fields
@@ -142,16 +143,25 @@ Points worth knowing before changing things:
   content edit would never reach the live site. Save still calls
   `revalidatePath('/', 'layout')`; the timer is what guarantees it lands.
 
-### Legacy hardcoded pages
+### Every page is database-driven
 
-The original detail pages for services, sectors, insulation and about still
-exist under `src/app/(site)/`. Next matches them before the `[slug]` routes, so
-they currently win. Once the seeded content is verified in the admin, deleting
-those files hands the routes to the database-driven versions. Until then they
-are a rollback path.
+There are no hardcoded content pages left. `src/app/(site)/` holds only listing
+pages and `[slug]` routes, and each one reads from Supabase — so adding a
+service, sector, pattern, insulation page, about page or article in the admin
+creates its page with no new file.
+
+Each detail route renders through one shared component (`ServiceDetail`,
+`SectorDetail`, `InsulationDetail`, `TeamGrid`), transcribed from the pages it
+replaced so the markup is unchanged. Where the published pages differed —
+two panel layouts on the service pages, bullets versus label pills — the
+component supports both rather than settling on one.
 
 `src/lib/{services,sectors,patterns,insulation,site}.ts` are still imported as
-the fallback data described above, and should not be deleted with them.
+the fallback data described above, and should not be deleted.
+
+The migration scripts that moved this content into the database have been
+removed. They parsed the exact structure of the pages they read, so running
+them against anything else would fail quietly rather than loudly.
 
 ### Deployment
 
