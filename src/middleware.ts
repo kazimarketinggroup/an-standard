@@ -12,10 +12,21 @@ import { SUPABASE_PUBLIC_KEY, SUPABASE_URL, isSupabaseConfigured } from '@/lib/s
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request: { headers: request.headers } })
 
-  // Without configuration there is no way to sign in, so let the login page
-  // render its own setup message rather than redirecting in a loop.
+  const { pathname: requestedPath } = request.nextUrl
+
+  /*
+   * Without configuration nobody can sign in, so nobody may pass. Letting the
+   * request through here would open the whole dashboard to anyone the moment
+   * the environment variables were missing — which is exactly what happened on
+   * the first deploy. Only the login page renders, to explain the problem.
+   */
   if (!isSupabaseConfigured) {
-    return response
+    if (requestedPath === '/admin/login') return response
+
+    const url = request.nextUrl.clone()
+    url.pathname = '/admin/login'
+    url.search = ''
+    return NextResponse.redirect(url)
   }
 
   const supabase = createServerClient(

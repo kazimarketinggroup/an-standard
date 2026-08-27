@@ -10,6 +10,7 @@ import {
   YouTubeIcon,
 } from '@/components/ui/Icons'
 import { site } from '@/lib/site'
+import { DEFAULT_HOURS, isClosed, parseOpeningHours } from '@/lib/hours'
 import { getContactPage } from '@/lib/cms/queries'
 import { imageSrc, text } from '@/lib/cms/fallbacks'
 import { multiline } from '@/lib/cms/render'
@@ -30,6 +31,9 @@ const socials = [
 
 export default async function ContactPage() {
   const page = await getContactPage()
+
+  const hoursText = text(page?.business_hours_text, DEFAULT_HOURS)
+  const businessHours = parseOpeningHours(hoursText)
 
   return (
     <section className="relative isolate overflow-hidden bg-brand-ink">
@@ -104,14 +108,33 @@ export default async function ContactPage() {
             <Reveal delay={0.24}>
               <div className="mt-8">
                 <h2 className="text-base font-semibold text-white">Business Hours</h2>
-                <p className="mt-2 text-sm leading-relaxed text-white/70">
-                  {multiline(
-                    text(
-                      page?.business_hours_text,
-                      'Monday – Friday: 9:00 AM – 5:00 PM\nClosed on weekends and public holidays.'
-                    )
-                  )}
-                </p>
+                {businessHours.length > 0 ? (
+                  <dl className="mt-3 max-w-xs space-y-1.5 text-sm">
+                    {businessHours.map(({ day, time }) => {
+                      const closed = isClosed(time)
+                      return (
+                        <div key={day} className="flex items-baseline gap-2">
+                          <dt className="shrink-0 text-white/60">{day}</dt>
+                          <span
+                            aria-hidden
+                            className="min-w-3 flex-1 translate-y-[-0.2em] border-b border-dotted border-white/20"
+                          />
+                          <dd
+                            className={`shrink-0 whitespace-nowrap tabular-nums ${
+                              closed ? 'text-white/40' : 'text-white/90'
+                            }`}
+                          >
+                            {time}
+                          </dd>
+                        </div>
+                      )
+                    })}
+                  </dl>
+                ) : (
+                  <p className="mt-2 text-sm leading-relaxed text-white/70">
+                    {multiline(hoursText)}
+                  </p>
+                )}
               </div>
             </Reveal>
 

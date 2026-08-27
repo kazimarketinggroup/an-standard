@@ -7,6 +7,8 @@
  * type-checked against the CMS types.
  */
 
+import { DEFAULT_HOURS } from '../src/lib/hours'
+
 export const globalSettings = {
   id: 1,
   company_name: 'A.N. Standard Ltd.',
@@ -21,7 +23,7 @@ export const globalSettings = {
   footer_logo_image: '/images/home/footerLogoWhite.png',
   address_line1: 'Unit 11A, Parkrose Industrial Estate,',
   address_line2: 'Middlemore Road, West Midlands, B66 2DZ',
-  office_hours: 'Opening hours (TBC)',
+  office_hours: DEFAULT_HOURS,
   social_links: [
     { label: 'Facebook', url: 'https://facebook.com' },
     { label: 'Instagram', url: 'https://instagram.com' },
@@ -1006,7 +1008,7 @@ export const singletons = {
     phone: '0121 555 8101',
     whatsapp: '+447949709412',
     email: 'info@anstandardquilting.com',
-    business_hours_text: 'Opening hours (TBC)',
+    business_hours_text: DEFAULT_HOURS,
     social_links: [
       { label: 'Facebook', url: 'https://facebook.com' },
       { label: 'Instagram', url: 'https://instagram.com' },

@@ -8,6 +8,7 @@ import {
 } from '@/lib/cms/queries'
 import { imageSrc, text } from '@/lib/cms/fallbacks'
 import { site } from '@/lib/site'
+import { isClosed, parseOpeningHours } from '@/lib/hours'
 import { ArrowRightIcon, ClockIcon, MailIcon, PhoneIcon, WhatsAppIcon } from '../ui/Icons'
 
 /**
@@ -56,11 +57,12 @@ export default async function Footer() {
   const email = text(settings?.topbar_email, site.email)
   const emailHref = text(settings?.email_href, site.emailHref)
   const hours = text(settings?.office_hours, site.hours)
+  const openingHours = parseOpeningHours(hours)
 
   return (
     <footer className="bg-black text-white">
       <div className="container py-12 lg:py-14">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1.1fr]">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_auto]">
           <div>
             <Link href="/" aria-label={companyName} className="inline-block">
               <Image
@@ -125,20 +127,51 @@ export default async function Footer() {
                   className="flex items-center gap-2.5 transition-colors hover:text-white"
                 >
                   <WhatsAppIcon className="h-4 w-4 shrink-0 text-brand-red" />
-                  WhatsApp {whatsapp}
+                  <span className="whitespace-nowrap">WhatsApp {whatsapp}</span>
                 </a>
               </li>
               <li>
-                <a href={emailHref} className="flex items-start gap-2.5 transition-colors hover:text-white">
-                  <MailIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-red" />
-                  <span className="break-all">{email}</span>
+                <a href={emailHref} className="flex items-center gap-2.5 transition-colors hover:text-white">
+                  <MailIcon className="h-4 w-4 shrink-0 text-brand-red" />
+                  <span className="whitespace-nowrap">{email}</span>
                 </a>
               </li>
-              <li className="flex items-center gap-2.5">
+            </ul>
+
+            {openingHours.length > 0 ? (
+              <div className="mt-6 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+                <h4 className="flex items-center gap-2.5 text-sm font-semibold text-white">
+                  <ClockIcon className="h-4 w-4 shrink-0 text-brand-red" />
+                  Opening hours
+                </h4>
+                <dl className="mt-3 space-y-1.5 text-sm">
+                  {openingHours.map(({ day, time }) => {
+                    const closed = isClosed(time)
+                    return (
+                      <div key={day} className="flex items-baseline gap-2">
+                        <dt className="shrink-0 text-white/60">{day}</dt>
+                        <span
+                          aria-hidden
+                          className="min-w-3 flex-1 translate-y-[-0.2em] border-b border-dotted border-white/20"
+                        />
+                        <dd
+                          className={`shrink-0 whitespace-nowrap tabular-nums ${
+                            closed ? 'text-white/40' : 'text-white/90'
+                          }`}
+                        >
+                          {time}
+                        </dd>
+                      </div>
+                    )
+                  })}
+                </dl>
+              </div>
+            ) : (
+              <p className="mt-6 flex items-center gap-2.5 text-sm text-white/60">
                 <ClockIcon className="h-4 w-4 shrink-0 text-brand-red" />
                 {hours}
-              </li>
-            </ul>
+              </p>
+            )}
           </div>
         </div>
       </div>

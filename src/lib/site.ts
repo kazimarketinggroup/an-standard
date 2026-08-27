@@ -1,3 +1,5 @@
+import { DEFAULT_HOURS } from './hours'
+
 export const site = {
   name: 'A.N. Standard Ltd.',
   phone: '0121 555 8101',
@@ -7,7 +9,8 @@ export const site = {
   whatsappHref: 'https://wa.me/447949709412',
   email: 'info@standardquilting.com',
   emailHref: 'mailto:info@standardquilting.com',
-  hours: 'Opening hours (TBC)',
+  // One "Day: time" pair per line — see lib/hours.ts for the schedule itself.
+  hours: DEFAULT_HOURS,
   address: {
     line1: 'Unit 11A, Parkrose Industrial Estate,',
     line2: 'Middlemore Road, West Midlands, B66 2DZ',
